@@ -1,3 +1,8 @@
+Release 0.1.1 - 2013/04/24
+
+  * Fix SetTagKeyMixin
+    https://github.com/repeatedly/fluent-plugin-record-modifier/pull/1
+
 Release 0.1.0 - 2013/04/7
 
   * First release
