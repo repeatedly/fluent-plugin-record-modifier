@@ -13,10 +13,12 @@ class RecordModifierOutputTest < Test::Unit::TestCase
 
     gen_host ${hostname}
     foo bar
+    include_tag_key
+    tag_key included_tag
   ]
 
   def create_driver(conf = CONFIG)
-    Fluent::Test::OutputTestDriver.new(Fluent::RecordModifierOutput).configure(conf)
+    Fluent::Test::OutputTestDriver.new(Fluent::RecordModifierOutput, tag='test_tag').configure(conf)
   end
 
   def get_hostname
@@ -40,7 +42,7 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       d.emit("a" => 2)
     end
 
-    mapped = {'gen_host' => get_hostname, 'foo' => 'bar'}
+    mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => 'test_tag'}
     assert_equal [
       {"a" => 1}.merge(mapped),
       {"a" => 2}.merge(mapped),

@@ -25,6 +25,7 @@ module Fluent
 
     def emit(tag, es, chain)
       es.each { |time, record|
+        filter_record(tag, time, record)
         Engine.emit(@tag, time, modify_record(record))
       }
 
