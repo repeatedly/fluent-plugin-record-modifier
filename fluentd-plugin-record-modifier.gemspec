@@ -2,7 +2,7 @@
 $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name        = "fluent-plugin-record-modifier"
+  gem.name        = "fluentd-plugin-record-modifier"
   gem.description = "Output filter plugin for modifying each event record"
   gem.homepage    = "https://github.com/repeatedly/fluent-plugin-record-modifier"
   gem.summary     = gem.description
@@ -16,7 +16,8 @@ Gem::Specification.new do |gem|
   gem.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ['lib']
 
-  gem.add_dependency "fluentd", "~> 0.10.17"
+  gem.add_dependency "fluentd", "~> 0.11.0"
   gem.add_dependency "fluent-mixin-config-placeholders", "~> 0.2.0"
   gem.add_development_dependency "rake", ">= 0.9.2"
+  gem.add_development_dependency "rspec", ">= 2.13.0"
 end
