@@ -9,17 +9,17 @@ In this case, you can use *record_modifier* to add "hostname" field to event rec
 
 Use RubyGems:
 
-    gem install fluent-plugin-record-modifier
+    gem install fluentd-plugin-record-modifier
 
 ## Configuration
 
-    <match pattern>
+    <filter pattern>
       type record_modifier
       tag foo.filtered
 
-      gen_host ${hostname}
+      gen_host ${Socket.gethostname.chomp}
       foo bar
-    </match>
+    </filter>
 
 If following record is passed:
 
@@ -33,16 +33,23 @@ then you got new record like below:
 {"message":"hello world!", "gen_host":"oreore-mac.local", "foo":"bar"}
 ```
 
-### Mixins
+### Simulation of SetTagKeyMixin and SetTimeKeyMixin
 
-* [SetTagKeyMixin](https://github.com/fluent/fluentd/blob/master/lib/fluent/mixin.rb#L181)
-* [fluent-mixin-config-placeholders](https://github.com/tagomoris/fluent-mixin-config-placeholders)
+In v11, Mixins are deleted. But we can realized same result using *record_modifier*.
+You can specifiy following configurations:
+
+* include_tag_key
+* tag_key
+* include_time_key
+* time_key
+* time_format
+* localtime
+* utc
+* time_as_epoch (include time as epoch integer, not formatted string)
 
 ## TODO
 
 * Adding following features if needed
-
-    * Use HandleTagNameMixin to keep original tag
 
     * Remove record field
 
