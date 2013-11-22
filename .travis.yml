@@ -4,10 +4,15 @@ rvm:
   - 1.9.2
   - 1.9.3
   - 2.0.0
-  - rbx-19mode
+  - ruby-head
+  - rbx-2.1.1
 
 branches:
   only:
     - master
+
+matrix:
+  allow_failures:
+    - rvm: rbx-2.1.1
 
 script: bundle exec rake test
