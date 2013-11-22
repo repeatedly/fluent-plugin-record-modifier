@@ -1,3 +1,9 @@
+Release 0.1.2 - 2013/11/22
+
+  * Add char_encoding parameter to handle charactor encoding in event record
+    https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding
+
+
 Release 0.1.1 - 2013/04/24
 
   * Fix SetTagKeyMixin
