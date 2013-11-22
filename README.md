@@ -49,7 +49,7 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
 
   # change char encoding from 'UTF-8' to 'EUC-JP'
   char_encoding utf-8:euc-jp
-</match
+</match>
 ```
 
 ### Mixins
