@@ -33,6 +33,25 @@ then you got new record like below:
 {"message":"hello world!", "gen_host":"oreore-mac.local", "foo":"bar"}
 ```
 
+### char_encoding
+
+Fluentd including some plugins treats the logs as a BINARY by default to forward.
+But an user sometimes processes the logs depends on their requirements, e.g. handling char encoding correctly.
+
+`char_encoding` parameter is useful for this case.
+
+```conf
+<match pattern>
+  type record_modifier
+
+  # set UTF-8 encoding information to string.
+  char_encoding utf-8
+
+  # change char encoding from 'UTF-8' to 'EUC-JP'
+  char_encoding utf-8:euc-jp
+</match
+```
+
 ### Mixins
 
 * [SetTagKeyMixin](https://github.com/fluent/fluentd/blob/master/lib/fluent/mixin.rb#L181)

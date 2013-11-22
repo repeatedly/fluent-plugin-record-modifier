@@ -48,4 +48,35 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       {"a" => 2}.merge(mapped),
     ], d.records
   end
+
+  def test_set_char_encoding
+    d = create_driver %[
+      type record_modifier
+
+      tag foo.filtered
+      char_encoding utf-8
+    ]
+
+
+    d.run do
+      d.emit("k" => 'v'.force_encoding('BINARY'))
+    end
+
+    assert_equal [{"k" => 'v'.force_encoding('UTF-8')}], d.records
+  end
+
+  def test_convert_char_encoding
+    d = create_driver %[
+      type record_modifier
+
+      tag foo.filtered
+      char_encoding utf-8:cp932
+    ]
+
+    d.run do
+      d.emit("k" => 'v'.force_encoding('utf-8'))
+    end
+
+    assert_equal [{"k" => 'v'.force_encoding('cp932')}], d.records
+  end
 end
