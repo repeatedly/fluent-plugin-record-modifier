@@ -13,6 +13,7 @@ branches:
 
 matrix:
   allow_failures:
+    - rvm: ruby-head
     - rvm: rbx
 
 script: bundle exec rake test
