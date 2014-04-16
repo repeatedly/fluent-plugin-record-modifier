@@ -15,6 +15,7 @@ class RecordModifierOutputTest < Test::Unit::TestCase
     foo bar
     include_tag_key
     tag_key included_tag
+    remove_keys hoge
   ]
 
   def create_driver(conf = CONFIG)
@@ -78,5 +79,35 @@ class RecordModifierOutputTest < Test::Unit::TestCase
     end
 
     assert_equal [{"k" => 'v'.force_encoding('cp932')}], d.records
+  end
+
+  def test_remove_one_key
+    d = create_driver %[
+      type record_modifier
+
+      tag foo.filtered
+      remove_keys k1
+    ]
+
+    d.run do
+      d.emit("k1" => 'v', "k2" => 'v')
+    end
+
+    assert_equal [{"k2" => 'v'}], d.records
+  end
+
+  def test_remove_multiple_keys
+    d = create_driver %[
+      type record_modifier
+
+      tag foo.filtered
+      remove_keys k1, k2, k3
+    ]
+
+    d.run do
+      d.emit("k1" => 'v', "k2" => 'v', "k4" => 'v')
+    end
+
+    assert_equal [{"k4" => 'v'}], d.records
   end
 end

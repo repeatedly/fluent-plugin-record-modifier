@@ -6,11 +6,12 @@ module Fluent
 
     config_param :tag, :string
     config_param :char_encoding, :string, :default => nil
+    config_param :remove_keys, :string, :default => nil
 
     include SetTagKeyMixin
     include Fluent::Mixin::ConfigPlaceholders
 
-    BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding)
+    BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding remove_keys)
 
     def configure(conf)
       super
@@ -38,6 +39,10 @@ module Fluent
           define_method(:change_encoding, m)
         end
       end
+
+      if @remove_keys
+        @remove_keys = @remove_keys.split(',').map {|e| e.strip }
+      end
     end
 
     def emit(tag, es, chain)
@@ -55,6 +60,12 @@ module Fluent
       @map.each_pair { |k, v|
         record[k] = v
       }
+
+      if @remove_keys
+        @remove_keys.each { |v|
+          record.delete(v)
+        }
+      end
 
       record = change_encoding(record) if @char_encoding
       record

@@ -52,6 +52,32 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
 </match>
 ```
 
+### remove_keys
+
+The logs include needless record keys in some cases.
+You can remove it by using `remove_keys` parameter.
+
+```conf
+<match pattern>
+  type record_modifier
+
+  # remove key1 and key2 keys from record
+  remove_keys key1,key2
+</match>
+```
+
+If following record is passed:
+
+```js
+{"key1":"hoge", "key2":"foo", "key3":"bar"}
+```
+
+then you got new record like below:
+
+```js
+{"key3":"bar"}
+```
+
 ### Mixins
 
 * [SetTagKeyMixin](https://github.com/fluent/fluentd/blob/master/lib/fluent/mixin.rb#L181)
@@ -62,8 +88,6 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
 * Adding following features if needed
 
     * Use HandleTagNameMixin to keep original tag
-
-    * Remove record field
 
     * Replace record value
 
