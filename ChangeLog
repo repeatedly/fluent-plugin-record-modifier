@@ -1,3 +1,9 @@
+Release 0.1.3 - 2014/04/16
+
+  * Add remove_keys option to remove needless fields from record
+    https://github.com/repeatedly/fluent-plugin-record-modifier#remove_keys
+
+
 Release 0.1.2 - 2013/11/22
 
   * Add char_encoding parameter to handle charactor encoding in event record
