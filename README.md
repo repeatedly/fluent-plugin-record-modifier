@@ -52,17 +52,17 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
 </match>
 ```
 
-### remove_fields
+### remove_keys
 
-The logs include needless fields in some cases.
-You can remove it by using `remove_fields` parameter.
+The logs include needless record keys in some cases.
+You can remove it by using `remove_keys` parameter.
 
 ```conf
 <match pattern>
   type record_modifier
 
-  # remove key1 and key2 fields from record
-  remove_fields key1,key2
+  # remove key1 and key2 keys from record
+  remove_keys key1,key2
 </match>
 ```
 
