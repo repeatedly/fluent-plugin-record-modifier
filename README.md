@@ -1,4 +1,4 @@
-# Output filter plugin for modifying each event record
+# Output filter plugin for modifying each event record for [Fluentd](http://fluentd.org)
 
 Adding arbitary field to event record without custmizing existence plugin.
 
