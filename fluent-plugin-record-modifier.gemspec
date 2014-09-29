@@ -18,6 +18,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency "fluentd", "~> 0.10.17"
-  gem.add_dependency "fluent-mixin-config-placeholders", "~> 0.2.0"
+  gem.add_dependency "fluent-mixin-config-placeholders", ">= 0.3.0"
   gem.add_development_dependency "rake", ">= 0.9.2"
 end
