@@ -1,3 +1,9 @@
+Release 0.2.0 - 2014/09/29
+
+  * Update fluent-mixin-config-placeholders to v0.3.0
+    https://github.com/repeatedly/fluent-plugin-record-modifier/pull/6
+
+
 Release 0.1.3 - 2014/04/16
 
   * Add remove_keys option to remove needless fields from record
