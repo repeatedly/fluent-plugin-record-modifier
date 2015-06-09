@@ -1,4 +1,4 @@
-# Output filter plugin for modifying each event record for [Fluentd](http://fluentd.org)
+# Filter plugin for modifying each event record for [Fluentd](http://fluentd.org)
 
 Adding arbitary field to event record without custmizing existence plugin.
 
@@ -12,6 +12,17 @@ Use RubyGems:
     gem install fluent-plugin-record-modifier
 
 ## Configuration
+
+In v0.12, you can use `record_modifier` filter.
+
+    <filter pattern>
+      type record_modifier
+
+      gen_host ${hostname}
+      foo bar
+    </filter>
+
+In v0.10, you can use `record_modifier` output to emulate filter.
 
     <match pattern>
       type record_modifier
@@ -41,7 +52,7 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
 `char_encoding` parameter is useful for this case.
 
 ```conf
-<match pattern>
+<filter pattern>
   type record_modifier
 
   # set UTF-8 encoding information to string.
@@ -49,7 +60,7 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
 
   # change char encoding from 'UTF-8' to 'EUC-JP'
   char_encoding utf-8:euc-jp
-</match>
+</filter>
 ```
 
 ### remove_keys
@@ -58,12 +69,12 @@ The logs include needless record keys in some cases.
 You can remove it by using `remove_keys` parameter.
 
 ```conf
-<match pattern>
+<filter pattern>
   type record_modifier
 
   # remove key1 and key2 keys from record
   remove_keys key1,key2
-</match>
+</filter>
 ```
 
 If following record is passed:
