@@ -52,7 +52,7 @@ module Fluent
       end
 
       if @remove_keys
-        @remove_keys = @remove_keys.split(',').map {|e| e.strip }
+        @remove_keys = @remove_keys.split(',').map { |e| e.strip }
       end
     end
 
@@ -98,18 +98,25 @@ module Fluent
 
     class DynamicExpander
       def initialize(param_key, param_value)
-        # TODO: Wrapping "" is not good for non-string field. Support direct embedd feature with better parser
-        __str_eval_code__ = param_value.gsub('${', '#{')
+        __str_eval_code__ =
+          if param_value.include?('${')
+            # TODO: Wrapping "" is not good for non-string field. Support direct embedd feature with better parser
+            "\"#{param_value.gsub('${', '#{')}\""
+          else
+            @param_value = param_value
+            '@param_value'
+          end
+
         (class << self; self; end).class_eval <<-EORUBY,  __FILE__, __LINE__ + 1
           def expand(tag, time, record, tag_parts)
-            "#{__str_eval_code__}"
+            #{__str_eval_code__}
           end
         EORUBY
 
         begin
           expand(nil, nil, nil, nil)
         rescue SyntaxError
-          raise ConfigError, "Pass invalid syntax parameter : key #{ param_key}, value = #{param_value}"
+          raise ConfigError, "Pass invalid syntax parameter : key = #{param_key}, value = #{param_value}"
         rescue
           # Ignore other runtime errors
         end
