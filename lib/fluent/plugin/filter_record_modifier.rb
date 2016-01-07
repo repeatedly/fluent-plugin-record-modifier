@@ -106,6 +106,9 @@ module Fluent
             '@param_value'
           end
 
+        # Use class_eval with string instead of define_method for performance.
+        # It can't share instructions but this is 2x+ faster than define_method in filter case.
+        # Refer: http://tenderlovemaking.com/2013/03/03/dynamic_method_definitions.html
         (class << self; self; end).class_eval <<-EORUBY,  __FILE__, __LINE__ + 1
           def expand(tag, time, record, tag_parts)
             #{__str_eval_code__}
