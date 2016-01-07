@@ -7,13 +7,16 @@ module Fluent
     config_param :char_encoding, :string, :default => nil
     config_param :remove_keys, :string, :default => nil
 
-    include SetTagKeyMixin
     include Fluent::Mixin::ConfigPlaceholders
 
-    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id include_tag_key tag_key char_encoding remove_keys)
+    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys)
 
     def configure(conf)
       super
+
+      if conf.has_key?('include_tag_key')
+        raise ConfigError, "include_tag_key and tag_key parameters are removed. Use 'tag ${tag}' in <record> section"
+      end
 
       @map = {}
       conf.each_pair { |k, v|
