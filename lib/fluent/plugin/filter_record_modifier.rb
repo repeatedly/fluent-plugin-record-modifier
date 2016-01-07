@@ -100,8 +100,7 @@ module Fluent
       def initialize(param_key, param_value)
         __str_eval_code__ =
           if param_value.include?('${')
-            # TODO: Wrapping "" is not good for non-string field. Support direct embedd feature with better parser
-            "\"#{param_value.gsub('${', '#{')}\""
+            parse_parameter(param_value)
           else
             @param_value = param_value
             '@param_value'
@@ -114,11 +113,25 @@ module Fluent
         EORUBY
 
         begin
+          # check eval genarates wrong code or not
           expand(nil, nil, nil, nil)
         rescue SyntaxError
           raise ConfigError, "Pass invalid syntax parameter : key = #{param_key}, value = #{param_value}"
         rescue
           # Ignore other runtime errors
+        end
+      end
+
+      def parse_parameter(value)
+        num_placeholders = value.scan('${').size
+        if num_placeholders == 1
+          if value.start_with?('${') && value.end_with?('}')
+            return value[2..-2]
+          else
+            "\"#{value.gsub('${', '#{')}\""
+          end
+        else
+          "\"#{value.gsub('${', '#{')}\""
         end
       end
     end
