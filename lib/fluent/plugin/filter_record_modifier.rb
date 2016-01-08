@@ -22,7 +22,7 @@ module Fluent
       conf.each_pair { |k, v|
         unless BUILTIN_CONFIGURATIONS.include?(k)
           conf.has_key?(k)
-          @map[k] = DynamicExpander.new(k, v)
+          @map[k] = v
         end
       }
 
