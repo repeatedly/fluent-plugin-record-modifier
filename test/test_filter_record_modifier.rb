@@ -12,12 +12,14 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   CONFIG = %[
     type record_modifier
-
-    gen_host ${hostname}
-    foo bar
-    include_tag_key
-    tag_key included_tag
     remove_keys hoge
+
+    <record>
+      gen_host ${hostname}
+      foo bar
+      included_tag ${tag}
+      tag_wrap -${tag_parts[0]}-${tag_parts[1]}-
+    </record>
   ]
 
   def create_driver(conf = CONFIG)
@@ -33,8 +35,9 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     d = create_driver
     map = d.instance.instance_variable_get(:@map)
 
-    assert_equal get_hostname, map['gen_host']
-    assert_equal 'bar', map['foo']
+    map.each_pair { |k, v|
+      assert v.is_a?(Fluent::RecordModifierFilter::DynamicExpander)
+    }
   end
 
   def test_format
@@ -45,7 +48,7 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       d.emit("a" => 2)
     end
 
-    mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => @tag}
+    mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => @tag, 'tag_wrap' => "-#{@tag.split('.')[0]}-#{@tag.split('.')[1]}-"}
     assert_equal [
       {"a" => 1}.merge(mapped),
       {"a" => 2}.merge(mapped),
