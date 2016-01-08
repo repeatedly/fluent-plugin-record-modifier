@@ -22,7 +22,8 @@ module Fluent
       conf.each_pair { |k, v|
         unless BUILTIN_CONFIGURATIONS.include?(k)
           conf.has_key?(k)
-          @map[k] = v
+          $log.warn "top level definition is deprecated. Please put parameters inside <record>: '#{k} #{v}'"
+          @map[k] = DynamicExpander.new(k, v)
         end
       }
 
