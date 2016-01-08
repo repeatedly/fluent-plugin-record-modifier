@@ -1,9 +1,10 @@
 language: ruby
 
 rvm:
-  - 1.9.3
   - 2.0.0
-  - 2.1.1
+  - 2.1
+  - 2.2.3
+  - 2.3.0
   - ruby-head
   - rbx
 
@@ -11,9 +12,13 @@ branches:
   only:
     - master
 
+gemfile:
+  - Gemfile
+
 matrix:
   allow_failures:
     - rvm: ruby-head
     - rvm: rbx
 
+before_install: gem update bundler
 script: bundle exec rake test
