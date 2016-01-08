@@ -55,6 +55,9 @@ module Fluent
       if @remove_keys
         @remove_keys = @remove_keys.split(',').map { |e| e.strip }
       end
+
+      # Collect DynamicExpander related garbage instructions
+      GC.start
     end
 
     def filter_stream(tag, es)
@@ -99,22 +102,20 @@ module Fluent
 
     class DynamicExpander
       def initialize(param_key, param_value)
-        __str_eval_code__ =
-          if param_value.include?('${')
-            parse_parameter(param_value)
-          else
-            @param_value = param_value
-            '@param_value'
-          end
+        if param_value.include?('${')
+          __str_eval_code__ = parse_parameter(param_value)
 
-        # Use class_eval with string instead of define_method for performance.
-        # It can't share instructions but this is 2x+ faster than define_method in filter case.
-        # Refer: http://tenderlovemaking.com/2013/03/03/dynamic_method_definitions.html
-        (class << self; self; end).class_eval <<-EORUBY,  __FILE__, __LINE__ + 1
-          def expand(tag, time, record, tag_parts)
-            #{__str_eval_code__}
-          end
-        EORUBY
+          # Use class_eval with string instead of define_method for performance.
+          # It can't share instructions but this is 2x+ faster than define_method in filter case.
+          # Refer: http://tenderlovemaking.com/2013/03/03/dynamic_method_definitions.html
+          (class << self; self; end).class_eval <<-EORUBY,  __FILE__, __LINE__ + 1
+            def expand(tag, time, record, tag_parts)
+              #{__str_eval_code__}
+            end
+          EORUBY
+        else
+          @param_value = param_value
+        end
 
         begin
           # check eval genarates wrong code or not
@@ -125,6 +126,13 @@ module Fluent
           # Ignore other runtime errors
         end
       end
+
+      # Default implementation for fixed value. This is overwritten when parameter contains '${xxx}' placeholder
+      def expand(tag, time, record, tag_parts)
+        @param_value
+      end
+
+      private
 
       def parse_parameter(value)
         num_placeholders = value.scan('${').size
