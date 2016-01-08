@@ -47,7 +47,7 @@ module Fluent
       conf.elements.select { |element| element.name == 'record' }.each do |element|
         element.each_pair do |k, v|
           element.has_key?(k) # to suppress unread configuration warning
-          @has_tag_parts = true if v.include?('${tag_parts')
+          @has_tag_parts = true if v.include?('tag_parts')
           @map[k] = DynamicExpander.new(k, v)
         end
       end
