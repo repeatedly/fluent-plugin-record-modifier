@@ -13,24 +13,16 @@ Use RubyGems:
 
 ## Configuration
 
-In v0.12, you can use `record_modifier` filter.
+Use `record_modifier` filter.
 
     <filter pattern>
-      type record_modifier
+      @type record_modifier
 
-      gen_host ${hostname}
-      foo bar
+      <record>
+        gen_host ${hostname}
+        foo bar
+      </record>
     </filter>
-
-In v0.10, you can use `record_modifier` output to emulate filter.
-
-    <match pattern>
-      type record_modifier
-      tag foo.filtered
-
-      gen_host ${hostname}
-      foo bar
-    </match>
 
 If following record is passed:
 
@@ -43,6 +35,37 @@ then you got new record like below:
 ```js
 {"message":"hello world!", "gen_host":"oreore-mac.local", "foo":"bar"}
 ```
+
+You can also use `record_transformer` like `${xxx}` placeholders and access `tag`, `time`, `record` and `tag_parts` values by Ruby code.
+
+    <filter pattern>
+      @type record_modifier
+
+      <record>
+        tag ${tag}
+        tag_extract ${tag_parts[0]}-${tag_pars[1]}-foo
+        formatted_time ${Time.at(time).to_s}
+        new_field foo:${record['key1'] + record['dict']['key']} 
+      </record>
+    </filter>
+
+`record_modifier` is faster than `record_transformer`. See [this comment](https://github.com/repeatedly/fluent-plugin-record-modifier/pull/7#issuecomment-169843012).
+But unlike `record_transformer`, `record_modifier` doesn't support following features for now.
+
+- tag_suffix and tag_prefix
+- dynamic key placeholder
+
+### record_modifier output
+
+In v0.10, you can use `record_modifier` output to emulate filter. `record_modifier` output doesn't support `<record>` way.
+
+    <match pattern>
+      type record_modifier
+      tag foo.filtered
+
+      gen_host ${hostname}
+      foo bar
+    </match>
 
 ### char_encoding
 
@@ -91,7 +114,6 @@ then you got new record like below:
 
 ### Mixins
 
-* [SetTagKeyMixin](https://github.com/fluent/fluentd/blob/master/lib/fluent/mixin.rb#L181)
 * [fluent-mixin-config-placeholders](https://github.com/tagomoris/fluent-mixin-config-placeholders)
 
 ## TODO
