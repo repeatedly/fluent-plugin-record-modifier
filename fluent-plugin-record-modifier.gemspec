@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name        = "fluent-plugin-record-modifier"
-  gem.description = "Output filter plugin for modifying each event record"
+  gem.description = "Filter plugin for modifying event record"
   gem.homepage    = "https://github.com/repeatedly/fluent-plugin-record-modifier"
   gem.summary     = gem.description
   gem.version     = File.read("VERSION").strip
