@@ -83,21 +83,25 @@ module Fluent
 
     private
 
-    def set_encoding(record)
-      record.each_pair { |k, v|
-        if v.is_a?(String)
-          v.force_encoding(@from_enc)
-        end
-      }
+    def set_encoding(value)
+      if value.is_a?(String)
+        value.force_encoding(@from_enc)
+      elsif value.is_a?(Hash)
+        value.each_pair { |k, v| set_encoding(v) }
+      elsif value.is_a?(Array)
+        value.each { |v| set_encoding(v) }
+      end
     end
 
-    def convert_encoding(record)
-      record.each_pair { |k, v|
-        if v.is_a?(String)
-          v.force_encoding(@from_enc) if v.encoding == Encoding::BINARY
-          v.encode!(@to_enc, @from_enc, :invalid => :replace, :undef => :replace)
-        end
-      }
+    def convert_encoding(value)
+      if value.is_a?(String)
+        value.force_encoding(@from_enc) if value.encoding == Encoding::BINARY
+        value.encode!(@to_enc, @from_enc, :invalid => :replace, :undef => :replace)
+      elsif value.is_a?(Hash)
+        value.each_pair { |k, v| convert_encoding(v) }
+      elsif value.is_a?(Array)
+        value.each { |v| convert_encoding(v) }
+      end
     end
 
     class DynamicExpander
