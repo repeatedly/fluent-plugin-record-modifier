@@ -4,9 +4,22 @@ module Fluent
   class RecordModifierOutput < Output
     Fluent::Plugin.register_output('record_modifier', self)
 
-    config_param :tag, :string
-    config_param :char_encoding, :string, :default => nil
-    config_param :remove_keys, :string, :default => nil
+    config_param :tag, :string,
+                 :desc => "The output record tag name."
+    config_param :char_encoding, :string, :default => nil,
+                 :desc => <<-DESC
+Fluentd including some plugins treats the logs as a BINARY by default to forward.
+But an user sometimes processes the logs depends on their requirements,
+e.g. handling char encoding correctly.
+In more detail, please refer this section:
+https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding.
+DESC
+
+    config_param :remove_keys, :string, :default => nil,
+                 :desc => <<-DESC
+The logs include needless record keys in some cases.
+You can remove it by using `remove_keys` parameter.
+DESC
 
     include SetTagKeyMixin
     include Fluent::Mixin::ConfigPlaceholders
