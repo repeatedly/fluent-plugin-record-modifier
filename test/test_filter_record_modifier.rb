@@ -62,12 +62,17 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       char_encoding utf-8
     ]
 
-
     d.run do
       d.emit("k" => 'v'.force_encoding('BINARY'))
+      d.emit("k" => %w(v ビ).map{|v| v.force_encoding('BINARY')})
+      d.emit("k" => {"l" => 'ビ'.force_encoding('BINARY')})
     end
 
-    assert_equal [{"k" => 'v'.force_encoding('UTF-8')}], d.filtered_as_array.map { |e| e.last }
+    assert_equal [
+      {"k" => 'v'.force_encoding('UTF-8')},
+      {"k" => %w(v ビ).map{|v| v.force_encoding('UTF-8')}},
+      {"k" => {"l" => 'ビ'.force_encoding('UTF-8')}},
+    ], d.filtered_as_array.map { |e| e.last }
   end
 
   def test_convert_char_encoding
@@ -79,9 +84,15 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     d.run do
       d.emit("k" => 'v'.force_encoding('utf-8'))
+      d.emit("k" => %w(v ビ).map{|v| v.force_encoding('utf-8')})
+      d.emit("k" => {"l" => 'ビ'.force_encoding('utf-8')})
     end
 
-    assert_equal [{"k" => 'v'.force_encoding('cp932')}], d.filtered_as_array.map { |e| e.last }
+    assert_equal [
+      {"k" => 'v'.force_encoding('cp932')},
+      {"k" => %w(v ビ).map{|v| v.encode!('cp932')}},
+      {"k" => {"l" => 'ビ'.encode!('cp932')}},
+    ], d.filtered_as_array.map { |e| e.last }
   end
 
   def test_remove_one_key
