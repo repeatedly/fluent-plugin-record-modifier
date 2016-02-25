@@ -112,6 +112,31 @@ then you got new record like below:
 {"key3":"bar"}
 ```
 
+### whitelist_keys
+
+If you want to handle the set of explicitly specified keys, you can use `whitelist_keys` of this plugin. It's exclusive with `remove_keys`.
+
+```conf
+<filter pattern>
+  type record_modifier
+
+  # remove all keys except for key1 and key2
+  whitelist_keys key1,key2
+</filter>
+```
+
+If following record is passed:
+
+```js
+{"key1":"hoge", "key2":"foo", "key3":"bar"}
+```
+
+then you got new record like below:
+
+```js
+{"key1":"hoge", "key2":"foo"}
+```
+
 ### Mixins
 
 * [fluent-mixin-config-placeholders](https://github.com/tagomoris/fluent-mixin-config-placeholders)
