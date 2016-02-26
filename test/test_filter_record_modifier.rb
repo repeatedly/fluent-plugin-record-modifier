@@ -122,4 +122,18 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     assert_equal [{"k4" => 'v'}], d.filtered_as_array.map { |e| e.last }
   end
+
+  def test_remove_non_whitelist_keys
+    d = create_driver %[
+      type record_modifier
+
+      whitelist_keys k1, k2, k3
+    ]
+
+    d.run do
+      d.emit("k1" => 'v', "k2" => 'v', "k4" => 'v', "k5" => 'v')
+    end
+
+    assert_equal [{"k1" => 'v', "k2" => 'v'}], d.filtered_as_array.map(&:last)
+  end
 end

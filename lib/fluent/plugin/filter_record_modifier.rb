@@ -4,23 +4,31 @@ module Fluent
   class RecordModifierFilter < Filter
     Fluent::Plugin.register_filter('record_modifier', self)
 
-    config_param :char_encoding, :string, :default => nil,
-                 :desc => <<-DESC
+    config_param :char_encoding, :string, default: nil,
+                 desc: <<-DESC
 Fluentd including some plugins treats the logs as a BINARY by default to forward.
 But an user sometimes processes the logs depends on their requirements,
 e.g. handling char encoding correctly.
 In more detail, please refer this section:
 https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding.
 DESC
-    config_param :remove_keys, :string, :default => nil,
-                 :desc => <<-DESC
+    config_param :remove_keys, :string, default: nil,
+                 desc: <<-DESC
 The logs include needless record keys in some cases.
 You can remove it by using `remove_keys` parameter.
+This option is exclusive with `whitelist_keys`.
+DESC
+
+    config_param :whitelist_keys, :string, default: nil,
+                 desc: <<-DESC
+Specify `whitelist_keys` to remove all unexpected keys and values from events.
+Modified events will have only specified keys (if exist in original events).
+This option is exclusive with `remove_keys`.
 DESC
 
     include Fluent::Mixin::ConfigPlaceholders
 
-    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys)
+    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys whitelist_keys)
 
     def configure(conf)
       super
@@ -63,8 +71,12 @@ DESC
         end
       end
 
-      if @remove_keys
-        @remove_keys = @remove_keys.split(',').map { |e| e.strip }
+      if @remove_keys and @whitelist_keys
+        raise Fluent::ConfigError, "remove_keys and whitelist_keys are exclusive with each other."
+      elsif @remove_keys
+        @remove_keys = @remove_keys.split(',').map(&:strip)
+      elsif @whitelist_keys
+        @whitelist_keys = @whitelist_keys.split(',').map(&:strip)
       end
 
       # Collect DynamicExpander related garbage instructions
@@ -84,6 +96,12 @@ DESC
           @remove_keys.each { |v|
             record.delete(v)
           }
+        elsif @whitelist_keys
+          modified = {}
+          record.each do |k, v|
+            modified[k] = v if @whitelist_keys.include?(k)
+          end
+          record = modified
         end
 
         record = change_encoding(record) if @char_encoding
