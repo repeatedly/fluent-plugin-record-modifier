@@ -1,3 +1,10 @@
+Release 0.4.1 - 2016/02/26
+
+  * Set/Convert encoding recursively
+    https://github.com/repeatedly/fluent-plugin-record-modifier/pull/9
+  * Add whitelist_keys option
+    https://github.com/repeatedly/fluent-plugin-record-modifier/pull/11
+
 Release 0.4.0 - 2016/01/08
 
   * Introduce <record> directive
