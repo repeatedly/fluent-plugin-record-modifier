@@ -1,6 +1,6 @@
 # Filter plugin for modifying each event record for [Fluentd](http://fluentd.org)
 
-Adding arbitary field to event record without custmizing existence plugin.
+Adding arbitary field to event record without customizing existence plugin.
 
 For example, generated event from *in_tail* doesn't contain "hostname" of running machine.
 In this case, you can use *record_modifier* to add "hostname" field to event record.
