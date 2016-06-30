@@ -19,7 +19,7 @@ Use `record_modifier` filter.
       @type record_modifier
 
       <record>
-        gen_host ${hostname}
+        gen_host "#{Socket.gethostname}"
         foo bar
       </record>
     </filter>
@@ -55,18 +55,6 @@ But unlike `record_transformer`, `record_modifier` doesn't support following fea
 - tag_suffix and tag_prefix
 - dynamic key placeholder
 
-### record_modifier output
-
-In v0.10, you can use `record_modifier` output to emulate filter. `record_modifier` output doesn't support `<record>` way.
-
-    <match pattern>
-      type record_modifier
-      tag foo.filtered
-
-      gen_host ${hostname}
-      foo bar
-    </match>
-
 ### char_encoding
 
 Fluentd including some plugins treats the logs as a BINARY by default to forward.
@@ -85,6 +73,8 @@ But an user sometimes processes the logs depends on their requirements, e.g. han
   char_encoding utf-8:euc-jp
 </filter>
 ```
+
+In `char_encoding from:to` case, it replaces invalid character with safe character.
 
 ### remove_keys
 
@@ -137,6 +127,18 @@ then you got new record like below:
 {"key1":"hoge", "key2":"foo"}
 ```
 
+### record_modifier output
+
+In v0.10, you can use `record_modifier` output to emulate filter. `record_modifier` output doesn't support `<record>` way.
+
+    <match pattern>
+      type record_modifier
+      tag foo.filtered
+
+      gen_host ${hostname}
+      foo bar
+    </match>
+
 ### Mixins
 
 * [fluent-mixin-config-placeholders](https://github.com/tagomoris/fluent-mixin-config-placeholders)
@@ -145,10 +147,7 @@ then you got new record like below:
 
 * Adding following features if needed
 
-    * Use HandleTagNameMixin to keep original tag
-
     * Replace record value
-
 
 ## Copyright
 
