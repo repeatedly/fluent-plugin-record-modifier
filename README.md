@@ -135,7 +135,7 @@ In v0.10, you can use `record_modifier` output to emulate filter. `record_modifi
       type record_modifier
       tag foo.filtered
 
-      gen_host ${hostname}
+      gen_host "#{Socket.gethostname}"
       foo bar
     </match>
 
