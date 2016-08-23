@@ -57,14 +57,14 @@ But unlike `record_transformer`, `record_modifier` doesn't support following fea
 
 ### char_encoding
 
-Fluentd including some plugins treats the logs as a BINARY by default to forward.
-But an user sometimes processes the logs depends on their requirements, e.g. handling char encoding correctly.
+Fluentd including some plugins treats logs as a BINARY by default to forward.
+But a user sometimes wants to process logs depends on their requirements, e.g. handling char encoding correctly.
 
 `char_encoding` parameter is useful for this case.
 
 ```conf
 <filter pattern>
-  type record_modifier
+  @type record_modifier
 
   # set UTF-8 encoding information to string.
   char_encoding utf-8
@@ -83,7 +83,7 @@ You can remove it by using `remove_keys` parameter.
 
 ```conf
 <filter pattern>
-  type record_modifier
+  @type record_modifier
 
   # remove key1 and key2 keys from record
   remove_keys key1,key2
@@ -108,7 +108,7 @@ If you want to handle the set of explicitly specified keys, you can use `whiteli
 
 ```conf
 <filter pattern>
-  type record_modifier
+  @type record_modifier
 
   # remove all keys except for key1 and key2
   whitelist_keys key1,key2
@@ -138,10 +138,6 @@ In v0.10, you can use `record_modifier` output to emulate filter. `record_modifi
       gen_host "#{Socket.gethostname}"
       foo bar
     </match>
-
-### Mixins
-
-* [fluent-mixin-config-placeholders](https://github.com/tagomoris/fluent-mixin-config-placeholders)
 
 ## TODO
 
