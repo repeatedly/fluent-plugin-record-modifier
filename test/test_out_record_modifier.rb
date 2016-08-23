@@ -7,19 +7,19 @@ class RecordModifierOutputTest < Test::Unit::TestCase
     Fluent::Test.setup
   end
 
-  CONFIG = %[
+  CONFIG = %q!
     type record_modifier
     tag foo.filtered
 
-    gen_host ${hostname}
+    gen_host "#{Socket.gethostname}"
     foo bar
     include_tag_key
     tag_key included_tag
     remove_keys hoge
-  ]
+  !
 
   def create_driver(conf = CONFIG)
-    Fluent::Test::OutputTestDriver.new(Fluent::RecordModifierOutput, tag='test_tag').configure(conf)
+    Fluent::Test::OutputTestDriver.new(Fluent::RecordModifierOutput, tag='test_tag').configure(conf, true)
   end
 
   def get_hostname
