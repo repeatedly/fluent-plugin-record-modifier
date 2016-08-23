@@ -1,4 +1,4 @@
-require 'fluent/mixin/config_placeholders'
+require 'fluent/output'
 
 module Fluent
   class RecordModifierOutput < Output
@@ -30,7 +30,6 @@ This option is exclusive with `remove_keys`.
 DESC
 
     include SetTagKeyMixin
-    include Fluent::Mixin::ConfigPlaceholders
 
     BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
 
@@ -40,6 +39,7 @@ DESC
       @map = {}
       conf.each_pair { |k, v|
         unless BUILTIN_CONFIGURATIONS.include?(k)
+          check_config_placeholders(k, v)
           conf.has_key?(k)
           @map[k] = v
         end
@@ -82,6 +82,16 @@ DESC
     end
 
     private
+
+    HOSTNAME_PLACEHOLDERS = %W(__HOSTNAME__ ${hostname})
+
+    def check_config_placeholders(k, v)
+      HOSTNAME_PLACEHOLDERS.each { |ph|
+        if v.include?(ph)
+          raise ConfigError, %!#{ph} placeholder in #{k} is removed. Use "\#{Socket.gethostname}" instead.!
+        end
+      }
+    end
 
     def modify_record(record)
       @map.each_pair { |k, v|

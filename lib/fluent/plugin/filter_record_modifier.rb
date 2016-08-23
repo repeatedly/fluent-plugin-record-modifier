@@ -1,4 +1,4 @@
-require 'fluent/mixin/config_placeholders'
+require 'fluent/filter'
 
 module Fluent
   class RecordModifierFilter < Filter
@@ -26,8 +26,6 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    include Fluent::Mixin::ConfigPlaceholders
-
     BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys whitelist_keys)
 
     def configure(conf)
@@ -40,6 +38,7 @@ DESC
       @map = {}
       conf.each_pair { |k, v|
         unless BUILTIN_CONFIGURATIONS.include?(k)
+          check_config_placeholders(k, v);
           conf.has_key?(k)
           $log.warn "top level definition is deprecated. Please put parameters inside <record>: '#{k} #{v}'"
           @map[k] = DynamicExpander.new(k, v)
@@ -65,6 +64,7 @@ DESC
       @has_tag_parts = false
       conf.elements.select { |element| element.name == 'record' }.each do |element|
         element.each_pair do |k, v|
+          check_config_placeholders(k, v)
           element.has_key?(k) # to suppress unread configuration warning
           @has_tag_parts = true if v.include?('tag_parts')
           @map[k] = DynamicExpander.new(k, v)
@@ -131,6 +131,16 @@ DESC
       elsif value.is_a?(Array)
         value.each { |v| convert_encoding(v) }
       end
+    end
+
+    HOSTNAME_PLACEHOLDERS = %W(__HOSTNAME__ ${hostname})
+
+    def check_config_placeholders(k, v)
+      HOSTNAME_PLACEHOLDERS.each { |ph|
+        if v.include?(ph)
+          raise ConfigError, %!#{ph} placeholder in #{k} is removed. Use "\#{Socket.gethostname}" instead.!
+        end
+      }
     end
 
     class DynamicExpander
