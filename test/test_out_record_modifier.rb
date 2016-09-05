@@ -38,10 +38,9 @@ class RecordModifierOutputTest < Test::Unit::TestCase
   def test_format
     d = create_driver
 
-    time = Time.now.to_i
     d.run(default_tag: 'test_tag') do
-      d.feed(time, {"a" => 1})
-      d.feed(time, {"a" => 2})
+      d.feed({"a" => 1})
+      d.feed({"a" => 2})
     end
 
     mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => 'test_tag'}
@@ -59,9 +58,8 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       char_encoding utf-8
     ]
 
-    time = Time.now.to_i
     d.run(default_tag: 'test_tag') do
-      d.feed(time, {"k" => 'v'.force_encoding('BINARY')})
+      d.feed({"k" => 'v'.force_encoding('BINARY')})
     end
 
     assert_equal [{"k" => 'v'.force_encoding('UTF-8')}], d.events.map { |e| e.last }
@@ -75,7 +73,6 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       char_encoding utf-8:cp932
     ]
 
-    time = Time.now.to_i
     d.run(default_tag: 'test_tag') do
       d.feed("k" => 'v'.force_encoding('utf-8'))
     end
@@ -91,9 +88,8 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       remove_keys k1
     ]
 
-    time = Time.now.to_i
     d.run(default_tag: 'test_tag') do
-      d.feed(time, {"k1" => 'v', "k2" => 'v'})
+      d.feed({"k1" => 'v', "k2" => 'v'})
     end
 
     assert_equal [{"k2" => 'v'}], d.events.map { |e| e.last }
@@ -107,9 +103,8 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       remove_keys k1, k2, k3
     ]
 
-    time = Time.now.to_i
     d.run(default_tag: 'test_tag') do
-      d.feed(time, {"k1" => 'v', "k2" => 'v', "k4" => 'v'})
+      d.feed({"k1" => 'v', "k2" => 'v', "k4" => 'v'})
     end
 
     assert_equal [{"k4" => 'v'}], d.events.map { |e| e.last }
@@ -123,9 +118,8 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       whitelist_keys k1, k2, k3
     ]
 
-    time = Time.now.to_i
     d.run(default_tag: 'test_tag') do
-      d.feed(time, {"k1" => 'v', "k2" => 'v', "k4" => 'v', "k5" => 'v'})
+      d.feed({"k1" => 'v', "k2" => 'v', "k4" => 'v', "k5" => 'v'})
     end
 
     assert_equal [{"k1" => 'v', "k2" => 'v'}], d.events.map { |e| e.last }
