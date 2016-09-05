@@ -1,7 +1,7 @@
-require 'fluent/filter'
+require 'fluent/plugin/filter'
 
 module Fluent
-  class RecordModifierFilter < Filter
+  class Plugin::RecordModifierFilter < Plugin::Filter
     Fluent::Plugin.register_filter('record_modifier', self)
 
     config_param :char_encoding, :string, default: nil,

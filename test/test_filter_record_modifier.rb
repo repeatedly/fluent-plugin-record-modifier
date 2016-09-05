@@ -1,8 +1,8 @@
+# coding: utf-8
 require 'fluent/test'
+require 'fluent/test/driver/filter'
 require 'fluent/plugin/filter_record_modifier'
 require 'test/unit'
-
-exit unless defined?(Fluent::Filter)
 
 class RecordModifierFilterTest < Test::Unit::TestCase
   def setup
@@ -23,7 +23,7 @@ class RecordModifierFilterTest < Test::Unit::TestCase
   !
 
   def create_driver(conf = CONFIG)
-    Fluent::Test::FilterTestDriver.new(Fluent::RecordModifierFilter, @tag).configure(conf, true)
+    Fluent::Test::Driver::Filter.new(Fluent::Plugin::RecordModifierFilter).configure(conf)
   end
 
   def get_hostname
@@ -36,23 +36,23 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     map = d.instance.instance_variable_get(:@map)
 
     map.each_pair { |k, v|
-      assert v.is_a?(Fluent::RecordModifierFilter::DynamicExpander)
+      assert v.is_a?(Fluent::Plugin::RecordModifierFilter::DynamicExpander)
     }
   end
 
   def test_format
     d = create_driver
 
-    d.run do
-      d.emit("a" => 1)
-      d.emit("a" => 2)
+    d.run(default_tag: @tag) do
+      d.feed("a" => 1)
+      d.feed("a" => 2)
     end
 
     mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => @tag, 'tag_wrap' => "-#{@tag.split('.')[0]}-#{@tag.split('.')[1]}-"}
     assert_equal [
       {"a" => 1}.merge(mapped),
       {"a" => 2}.merge(mapped),
-    ], d.filtered_as_array.map { |e| e.last }
+    ], d.filtered.map { |e| e.last }
   end
 
   def test_set_char_encoding
@@ -62,17 +62,17 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       char_encoding utf-8
     ]
 
-    d.run do
-      d.emit("k" => 'v'.force_encoding('BINARY'))
-      d.emit("k" => %w(v ビ).map{|v| v.force_encoding('BINARY')})
-      d.emit("k" => {"l" => 'ビ'.force_encoding('BINARY')})
+    d.run(default_tag: @tag) do
+      d.feed("k" => 'v'.force_encoding('BINARY'))
+      d.feed("k" => %w(v ビ).map{|v| v.force_encoding('BINARY')})
+      d.feed("k" => {"l" => 'ビ'.force_encoding('BINARY')})
     end
 
     assert_equal [
       {"k" => 'v'.force_encoding('UTF-8')},
       {"k" => %w(v ビ).map{|v| v.force_encoding('UTF-8')}},
       {"k" => {"l" => 'ビ'.force_encoding('UTF-8')}},
-    ], d.filtered_as_array.map { |e| e.last }
+    ], d.filtered.map { |e| e.last }
   end
 
   def test_convert_char_encoding
@@ -82,17 +82,17 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       char_encoding utf-8:cp932
     ]
 
-    d.run do
-      d.emit("k" => 'v'.force_encoding('utf-8'))
-      d.emit("k" => %w(v ビ).map{|v| v.force_encoding('utf-8')})
-      d.emit("k" => {"l" => 'ビ'.force_encoding('utf-8')})
+    d.run(default_tag: @tag) do
+      d.feed("k" => 'v'.force_encoding('utf-8'))
+      d.feed("k" => %w(v ビ).map{|v| v.force_encoding('utf-8')})
+      d.feed("k" => {"l" => 'ビ'.force_encoding('utf-8')})
     end
 
     assert_equal [
       {"k" => 'v'.force_encoding('cp932')},
       {"k" => %w(v ビ).map{|v| v.encode!('cp932')}},
       {"k" => {"l" => 'ビ'.encode!('cp932')}},
-    ], d.filtered_as_array.map { |e| e.last }
+    ], d.filtered.map { |e| e.last }
   end
 
   def test_remove_one_key
@@ -102,11 +102,11 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       remove_keys k1
     ]
 
-    d.run do
-      d.emit("k1" => 'v', "k2" => 'v')
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'v', "k2" => 'v')
     end
 
-    assert_equal [{"k2" => 'v'}], d.filtered_as_array.map { |e| e.last }
+    assert_equal [{"k2" => 'v'}], d.filtered.map { |e| e.last }
   end
 
   def test_remove_multiple_keys
@@ -116,11 +116,11 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       remove_keys k1, k2, k3
     ]
 
-    d.run do
-      d.emit("k1" => 'v', "k2" => 'v', "k4" => 'v')
+    d.run(default_tag: @tag) do
+      d.feed({"k1" => 'v', "k2" => 'v', "k4" => 'v'})
     end
 
-    assert_equal [{"k4" => 'v'}], d.filtered_as_array.map { |e| e.last }
+    assert_equal [{"k4" => 'v'}], d.filtered.map { |e| e.last }
   end
 
   def test_remove_non_whitelist_keys
@@ -130,10 +130,10 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       whitelist_keys k1, k2, k3
     ]
 
-    d.run do
-      d.emit("k1" => 'v', "k2" => 'v', "k4" => 'v', "k5" => 'v')
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'v', "k2" => 'v', "k4" => 'v', "k5" => 'v')
     end
 
-    assert_equal [{"k1" => 'v', "k2" => 'v'}], d.filtered_as_array.map(&:last)
+    assert_equal [{"k1" => 'v', "k2" => 'v'}], d.filtered.map(&:last)
   end
 end
