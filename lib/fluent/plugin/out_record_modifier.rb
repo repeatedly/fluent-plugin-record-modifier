@@ -1,8 +1,10 @@
-require 'fluent/output'
+require 'fluent/plugin/output'
 
 module Fluent
-  class RecordModifierOutput < Output
+  class Plugin::RecordModifierOutput < Plugin::Output
     Fluent::Plugin.register_output('record_modifier', self)
+
+    helpers :event_emitter
 
     config_param :tag, :string,
                  desc: "The output record tag name."
@@ -70,15 +72,13 @@ DESC
       end
     end
 
-    def emit(tag, es, chain)
+    def process(tag, es)
       stream = MultiEventStream.new
       es.each { |time, record|
         filter_record(tag, time, record)
         stream.add(time, modify_record(record))
       }
-      Fluent::Engine.emit_stream(@tag, stream)
-
-      chain.next
+      router.emit_stream(@tag, stream)
     end
 
     private
