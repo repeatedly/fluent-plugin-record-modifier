@@ -48,6 +48,7 @@ DESC
         end
       }
 
+      @to_enc = nil
       if @char_encoding
         from, to = @char_encoding.split(':', 2)
         @from_enc = Encoding.find(from)
