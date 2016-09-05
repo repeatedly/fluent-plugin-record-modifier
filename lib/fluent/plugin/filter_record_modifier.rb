@@ -187,5 +187,5 @@ DESC
         end
       end
     end
-  end if defined?(Filter)
+  end
 end
