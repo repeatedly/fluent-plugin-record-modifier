@@ -4,7 +4,7 @@ module Fluent
   class Plugin::RecordModifierOutput < Plugin::Output
     Fluent::Plugin.register_output('record_modifier', self)
 
-    helpers :event_emitter
+    helpers :event_emitter, :compat_parameters
 
     config_param :tag, :string,
                  desc: "The output record tag name."
@@ -36,6 +36,7 @@ DESC
     BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
 
     def configure(conf)
+      compat_parameters_convert(conf, :buffer)
       super
 
       @map = {}
