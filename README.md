@@ -43,7 +43,7 @@ You can also use `record_transformer` like `${xxx}` placeholders and access `tag
 
       <record>
         tag ${tag}
-        tag_extract ${tag_parts[0]}-${tag_pars[1]}-foo
+        tag_extract ${tag_parts[0]}-${tag_parts[1]}-foo
         formatted_time ${Time.at(time).to_s}
         new_field foo:${record['key1'] + record['dict']['key']} 
       </record>
