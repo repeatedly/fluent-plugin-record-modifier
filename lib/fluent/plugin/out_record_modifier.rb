@@ -31,7 +31,7 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
+    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
 
     def configure(conf)
       compat_parameters_convert(conf, :buffer, :inject)
