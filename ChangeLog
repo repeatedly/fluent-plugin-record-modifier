@@ -1,3 +1,7 @@
+Release 0.6.0 - 2017/06/06
+
+  * Drop fluentd v0.10 support
+
 Release 0.5.0 - 2016/08/23
 
   * Remove fluent-plugin-config-placeholder dependency
