@@ -31,7 +31,7 @@ DESC
 
     include SetTagKeyMixin
 
-    BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
+    BUILTIN_CONFIGURATIONS = %W(type @type @id id @log_level log_level tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
 
     def configure(conf)
       super
@@ -76,7 +76,7 @@ DESC
         filter_record(tag, time, record)
         stream.add(time, modify_record(record))
       }
-      Fluent::Engine.emit_stream(@tag, stream)
+      router.emit_stream(@tag, stream)
 
       chain.next
     end
