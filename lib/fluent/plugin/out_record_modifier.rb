@@ -1,8 +1,10 @@
-require 'fluent/output'
+require 'fluent/plugin/output'
 
 module Fluent
-  class RecordModifierOutput < Output
+  class Plugin::RecordModifierOutput < Plugin::Output
     Fluent::Plugin.register_output('record_modifier', self)
+
+    helpers :event_emitter, :compat_parameters, :inject
 
     config_param :tag, :string,
                  desc: "The output record tag name."
@@ -29,11 +31,10 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    include SetTagKeyMixin
-
     BUILTIN_CONFIGURATIONS = %W(type tag include_tag_key tag_key char_encoding remove_keys whitelist_keys)
 
     def configure(conf)
+      compat_parameters_convert(conf, :buffer, :inject)
       super
 
       @map = {}
@@ -45,6 +46,7 @@ DESC
         end
       }
 
+      @to_enc = nil
       if @char_encoding
         from, to = @char_encoding.split(':', 2)
         @from_enc = Encoding.find(from)
@@ -70,15 +72,13 @@ DESC
       end
     end
 
-    def emit(tag, es, chain)
+    def process(tag, es)
       stream = MultiEventStream.new
       es.each { |time, record|
-        filter_record(tag, time, record)
+        record = inject_values_to_record(tag, time, record)
         stream.add(time, modify_record(record))
       }
-      Fluent::Engine.emit_stream(@tag, stream)
-
-      chain.next
+      router.emit_stream(@tag, stream)
     end
 
     private

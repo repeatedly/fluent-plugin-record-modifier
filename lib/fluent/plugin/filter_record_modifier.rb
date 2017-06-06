@@ -1,7 +1,7 @@
-require 'fluent/filter'
+require 'fluent/plugin/filter'
 
 module Fluent
-  class RecordModifierFilter < Filter
+  class Plugin::RecordModifierFilter < Plugin::Filter
     Fluent::Plugin.register_filter('record_modifier', self)
 
     config_param :char_encoding, :string, default: nil,
@@ -45,6 +45,7 @@ DESC
         end
       }
 
+      @to_enc = nil
       if @char_encoding
         from, to = @char_encoding.split(':', 2)
         @from_enc = Encoding.find(from)
@@ -83,31 +84,27 @@ DESC
       GC.start
     end
 
-    def filter_stream(tag, es)
-      new_es = MultiEventStream.new
+    def filter(tag, time, record)
       tag_parts = @has_tag_parts ? tag.split('.') : nil
 
-      es.each { |time, record|
-        @map.each_pair { |k, v|
-          record[k] = v.expand(tag, time, record, tag_parts)
-        }
-
-        if @remove_keys
-          @remove_keys.each { |v|
-            record.delete(v)
-          }
-        elsif @whitelist_keys
-          modified = {}
-          record.each do |k, v|
-            modified[k] = v if @whitelist_keys.include?(k)
-          end
-          record = modified
-        end
-
-        record = change_encoding(record) if @char_encoding
-        new_es.add(time, record)
+      @map.each_pair { |k, v|
+        record[k] = v.expand(tag, time, record, tag_parts)
       }
-      new_es
+
+      if @remove_keys
+        @remove_keys.each { |v|
+          record.delete(v)
+        }
+      elsif @whitelist_keys
+        modified = {}
+        record.each do |k, v|
+          modified[k] = v if @whitelist_keys.include?(k)
+        end
+        record = modified
+      end
+
+      record = change_encoding(record) if @char_encoding
+      record
     end
 
     private
@@ -190,5 +187,5 @@ DESC
         end
       end
     end
-  end if defined?(Filter)
+  end
 end
