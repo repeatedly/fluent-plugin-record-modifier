@@ -5,6 +5,15 @@ Adding arbitary field to event record without customizing existence plugin.
 For example, generated event from *in_tail* doesn't contain "hostname" of running machine.
 In this case, you can use *record_modifier* to add "hostname" field to event record.
 
+## Requirements
+
+| fluent-plugin-record-modifier  | fluentd | ruby |
+|--------------------------------|---------|------|
+| >= 1.0.0 | >= v0.14.0 | >= 2.1 |
+|  < 1.0.0 | >= v0.12.0 | >= 1.9 |
+
+NOTE: fluent-plugin-record-modifier v1.0.0 is now RC. We will release stable v1.0.0 soon.
+
 ## Installation
 
 Use RubyGems:
