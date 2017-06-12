@@ -12,6 +12,12 @@ e.g. handling char encoding correctly.
 In more detail, please refer this section:
 https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding.
 DESC
+
+    config_param :replace_keys, :bool, default: true,
+                 desc: <<-DESC
+Whether to replace a key or not if already in the record.
+DESC
+
     config_param :remove_keys, :string, default: nil,
                  desc: <<-DESC
 The logs include needless record keys in some cases.
@@ -26,7 +32,7 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys whitelist_keys)
+    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding replace_keys remove_keys whitelist_keys)
 
     def configure(conf)
       super
@@ -89,7 +95,9 @@ DESC
 
       es.each { |time, record|
         @map.each_pair { |k, v|
-          record[k] = v.expand(tag, time, record, tag_parts)
+          if @replace_keys || !record.has_key?(k)
+            record[k] = v.expand(tag, time, record, tag_parts)
+          end
         }
 
         if @remove_keys
