@@ -136,6 +136,20 @@ then you got new record like below:
 {"key1":"hoge", "key2":"foo"}
 ```
 
+### Ruby code trick for complex logic
+
+If you need own complex logic in filter, writing filter plugin is better. But if you don't want to write new plugin, you can use temporal key trick like below:
+
+```
+<filter reform.**>
+  @type record_modifier
+  remove_keys _dummy_
+  <record>
+    _dummy_ ${if record.has_key?('foo'); record['bar'] = 'Hi!'; end; nil}
+  </record>
+</filter>}
+```
+
 ### record_modifier output
 
 In v0.10, you can use `record_modifier` output to emulate filter. `record_modifier` output doesn't support `<record>` way.
