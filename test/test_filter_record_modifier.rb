@@ -136,4 +136,38 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     assert_equal [{"k1" => 'v', "k2" => 'v'}], d.filtered.map(&:last)
   end
+
+  sub_test_case 'frozen check' do
+    def test_set_char_encoding
+      d = create_driver %[
+        char_encoding utf-8
+      ]
+
+      d.run(default_tag: @tag) do
+        d.feed("k" => 'v'.force_encoding('BINARY').freeze)
+        d.feed("k" => {"l" => 'v'.force_encoding('BINARY').freeze})
+      end
+
+      assert_equal [
+        {"k" => 'v'.force_encoding('UTF-8')},
+        {"k" => {"l" => 'v'.force_encoding('UTF-8')}},
+      ], d.filtered.map { |e| e.last }
+    end
+
+    def test_convert_char_encoding
+      d = create_driver %[
+        char_encoding utf-8:cp932
+      ]
+
+      d.run(default_tag: @tag) do
+        d.feed("k" => 'v'.force_encoding('utf-8').freeze)
+        d.feed("k" => {"l" => 'v'.force_encoding('utf-8').freeze})
+      end
+
+      assert_equal [
+        {"k" => 'v'.force_encoding('cp932')},
+        {"k" => {"l" => 'v'.force_encoding('cp932')}},
+      ], d.filtered.map { |e| e.last }
+    end
+  end
 end
