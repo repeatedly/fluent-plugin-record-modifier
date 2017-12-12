@@ -11,7 +11,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
   end
 
   CONFIG = %q!
-    type record_modifier
     remove_keys hoge
 
     <record>
@@ -57,8 +56,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_set_char_encoding
     d = create_driver %[
-      type record_modifier
-
       char_encoding utf-8
     ]
 
@@ -77,8 +74,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_convert_char_encoding
     d = create_driver %[
-      type record_modifier
-
       char_encoding utf-8:cp932
     ]
 
@@ -97,8 +92,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_remove_one_key
     d = create_driver %[
-      type record_modifier
-
       remove_keys k1
     ]
 
@@ -111,8 +104,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_remove_multiple_keys
     d = create_driver %[
-      type record_modifier
-
       remove_keys k1, k2, k3
     ]
 
@@ -125,8 +116,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_remove_non_whitelist_keys
     d = create_driver %[
-      type record_modifier
-
       whitelist_keys k1, k2, k3
     ]
 
