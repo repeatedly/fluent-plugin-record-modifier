@@ -116,7 +116,13 @@ DESC
       if value.is_a?(String)
         value.force_encoding(@from_enc)
       elsif value.is_a?(Hash)
-        value.each_pair { |k, v| set_encoding(v) }
+        value.each_pair { |k, v|
+          if v.frozen?
+            value[k] = set_encoding(v.dup)
+          else
+            set_encoding(v)
+          end
+        }
       elsif value.is_a?(Array)
         value.each { |v| set_encoding(v) }
       end
@@ -127,7 +133,13 @@ DESC
         value.force_encoding(@from_enc) if value.encoding == Encoding::BINARY
         value.encode!(@to_enc, @from_enc, :invalid => :replace, :undef => :replace)
       elsif value.is_a?(Hash)
-        value.each_pair { |k, v| convert_encoding(v) }
+        value.each_pair { |k, v|
+          if v.frozen?
+            value[k] = convert_encoding(v.dup)
+          else
+            convert_encoding(v)
+          end
+        }
       elsif value.is_a?(Array)
         value.each { |v| convert_encoding(v) }
       end
