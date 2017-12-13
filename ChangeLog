@@ -1,3 +1,9 @@
+Release 0.6.1 - 2017/12/12
+
+  * Drop fluentd v0.10 support
+  * Add frozen object support
+    https://github.com/repeatedly/fluent-plugin-record-modifier/pull/26
+
 Release 0.6.0 - 2017/06/06
 
   * Drop fluentd v0.10 support
