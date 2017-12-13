@@ -11,7 +11,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
   end
 
   CONFIG = %q!
-    type record_modifier
     remove_keys hoge
 
     <record>
@@ -57,8 +56,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_set_char_encoding
     d = create_driver %[
-      type record_modifier
-
       char_encoding utf-8
     ]
 
@@ -77,8 +74,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_convert_char_encoding
     d = create_driver %[
-      type record_modifier
-
       char_encoding utf-8:cp932
     ]
 
@@ -97,8 +92,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_remove_one_key
     d = create_driver %[
-      type record_modifier
-
       remove_keys k1
     ]
 
@@ -111,8 +104,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_remove_multiple_keys
     d = create_driver %[
-      type record_modifier
-
       remove_keys k1, k2, k3
     ]
 
@@ -125,8 +116,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_remove_non_whitelist_keys
     d = create_driver %[
-      type record_modifier
-
       whitelist_keys k1, k2, k3
     ]
 
@@ -143,15 +132,15 @@ class RecordModifierFilterTest < Test::Unit::TestCase
         char_encoding utf-8
       ]
 
-      d.run(default_tag: @tag) do
-        d.feed("k" => 'v'.force_encoding('BINARY').freeze)
-        d.feed("k" => {"l" => 'v'.force_encoding('BINARY').freeze})
+      d.run do
+        d.emit("k" => 'v'.force_encoding('BINARY').freeze)
+        d.emit("k" => {"l" => 'v'.force_encoding('BINARY').freeze})
       end
 
       assert_equal [
         {"k" => 'v'.force_encoding('UTF-8')},
         {"k" => {"l" => 'v'.force_encoding('UTF-8')}},
-      ], d.filtered.map { |e| e.last }
+      ], d.filtered_as_array.map { |e| e.last }
     end
 
     def test_convert_char_encoding
@@ -159,15 +148,15 @@ class RecordModifierFilterTest < Test::Unit::TestCase
         char_encoding utf-8:cp932
       ]
 
-      d.run(default_tag: @tag) do
-        d.feed("k" => 'v'.force_encoding('utf-8').freeze)
-        d.feed("k" => {"l" => 'v'.force_encoding('utf-8').freeze})
+      d.run do
+        d.emit("k" => 'v'.force_encoding('utf-8').freeze)
+        d.emit("k" => {"l" => 'v'.force_encoding('utf-8').freeze})
       end
 
       assert_equal [
         {"k" => 'v'.force_encoding('cp932')},
         {"k" => {"l" => 'v'.force_encoding('cp932')}},
-      ], d.filtered.map { |e| e.last }
+      ], d.filtered_as_array.map { |e| e.last }
     end
   end
 end
