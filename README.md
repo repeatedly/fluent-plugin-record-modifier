@@ -1,4 +1,4 @@
-# Filter plugin for modifying each event record for [Fluentd](http://fluentd.org)
+# Filter plugin to modify event record for [Fluentd](http://fluentd.org)
 
 Adding arbitary field to event record without customizing existence plugin.
 
@@ -12,13 +12,11 @@ In this case, you can use *record_modifier* to add "hostname" field to event rec
 | >= 1.0.0 | >= v0.14.0 | >= 2.1 |
 |  < 1.0.0 | >= v0.12.0 | >= 1.9 |
 
-NOTE: fluent-plugin-record-modifier v1.0.0 is now RC. We will release stable v1.0.0 soon.
-
 ## Installation
 
 Use RubyGems:
 
-    gem install fluent-plugin-record-modifier
+    gem install fluent-plugin-record-modifier --no-document
 
 ## Configuration
 
