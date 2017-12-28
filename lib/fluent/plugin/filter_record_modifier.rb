@@ -31,8 +31,6 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys whitelist_keys prepare_value)
-
     def configure(conf)
       super
 
@@ -41,15 +39,6 @@ DESC
       end
 
       @map = {}
-      conf.each_pair { |k, v|
-        unless BUILTIN_CONFIGURATIONS.include?(k)
-          check_config_placeholders(k, v);
-          conf.has_key?(k)
-          $log.warn "top level definition is deprecated. Please put parameters inside <record>: '#{k} #{v}'"
-          @map[k] = DynamicExpander.new(k, v)
-        end
-      }
-
       @to_enc = nil
       if @char_encoding
         from, to = @char_encoding.split(':', 2)
