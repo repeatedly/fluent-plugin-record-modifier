@@ -117,7 +117,7 @@ DESC
         value.force_encoding(@from_enc)
       elsif value.is_a?(Hash)
         value.each_pair { |k, v|
-          if v.frozen?
+          if v.frozen? && v.is_a?(String)
             value[k] = set_encoding(v.dup)
           else
             set_encoding(v)
@@ -125,6 +125,8 @@ DESC
         }
       elsif value.is_a?(Array)
         value.each { |v| set_encoding(v) }
+      else
+        value
       end
     end
 
@@ -134,7 +136,7 @@ DESC
         value.encode!(@to_enc, @from_enc, :invalid => :replace, :undef => :replace)
       elsif value.is_a?(Hash)
         value.each_pair { |k, v|
-          if v.frozen?
+          if v.frozen? && v.is_a?(String)
             value[k] = convert_encoding(v.dup)
           else
             convert_encoding(v)
@@ -142,6 +144,8 @@ DESC
         }
       elsif value.is_a?(Array)
         value.each { |v| convert_encoding(v) }
+      else
+        value
       end
     end
 

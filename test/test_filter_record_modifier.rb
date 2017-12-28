@@ -133,13 +133,13 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       ]
 
       d.run do
-        d.emit("k" => 'v'.force_encoding('BINARY').freeze)
-        d.emit("k" => {"l" => 'v'.force_encoding('BINARY').freeze})
+        d.emit("k" => 'v'.force_encoding('BINARY').freeze, 'n' => 1)
+        d.emit("k" => {"l" => 'v'.force_encoding('BINARY').freeze, 'n' => 1})
       end
 
       assert_equal [
-        {"k" => 'v'.force_encoding('UTF-8')},
-        {"k" => {"l" => 'v'.force_encoding('UTF-8')}},
+        {"k" => 'v'.force_encoding('UTF-8'), 'n' => 1},
+        {"k" => {"l" => 'v'.force_encoding('UTF-8'), 'n' => 1}},
       ], d.filtered_as_array.map { |e| e.last }
     end
 
@@ -149,13 +149,13 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       ]
 
       d.run do
-        d.emit("k" => 'v'.force_encoding('utf-8').freeze)
-        d.emit("k" => {"l" => 'v'.force_encoding('utf-8').freeze})
+        d.emit("k" => 'v'.force_encoding('utf-8').freeze, 'n' => 1)
+        d.emit("k" => {"l" => 'v'.force_encoding('utf-8').freeze, 'n' => 1})
       end
 
       assert_equal [
-        {"k" => 'v'.force_encoding('cp932')},
-        {"k" => {"l" => 'v'.force_encoding('cp932')}},
+        {"k" => 'v'.force_encoding('cp932'), 'n' => 1},
+        {"k" => {"l" => 'v'.force_encoding('cp932'), 'n' => 1}},
       ], d.filtered_as_array.map { |e| e.last }
     end
   end
