@@ -1,3 +1,9 @@
+Release 1.0.2 - 2017/12/27
+
+  * Add prepare_value parameter
+  * Fix non-string object handling
+  * Remove deprecated code
+
 Release 1.0.1 - 2017/12/16
 
   * Fix fluentd dependency
