@@ -55,6 +55,20 @@ But unlike `record_transformer`, `record_modifier` doesn't support following fea
 - tag_suffix and tag_prefix
 - dynamic key placeholder
 
+### prepare_value
+
+Prepare values for filtering. This ruby code is evaluated in `configure` phase and prepared values can be used in `<record>`. Here is an example:
+
+    <filter pattern>
+      @type record_modifier
+      prepare_value require 'foo'; @foo = Foo.new
+      <record>
+        key ${@foo.method1}
+      </record>
+    </filter>
+
+This feature is useful for using external library.
+
 ### char_encoding
 
 Fluentd including some plugins treats logs as a BINARY by default to forward.

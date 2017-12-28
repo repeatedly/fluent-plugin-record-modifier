@@ -4,6 +4,11 @@ module Fluent
   class RecordModifierFilter < Filter
     Fluent::Plugin.register_filter('record_modifier', self)
 
+    config_param :prepare_value, :string, default: nil,
+                 desc: <<-DESC
+Prepare values for filtering in configure phase. Prepared values can be used in <record>.
+You can write any ruby code.
+DESC
     config_param :char_encoding, :string, default: nil,
                  desc: <<-DESC
 Fluentd including some plugins treats the logs as a BINARY by default to forward.
@@ -26,7 +31,7 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys whitelist_keys)
+    BUILTIN_CONFIGURATIONS = %W(type @type log_level @log_level id @id char_encoding remove_keys whitelist_keys prepare_value)
 
     def configure(conf)
       super
@@ -67,7 +72,7 @@ DESC
           check_config_placeholders(k, v)
           element.has_key?(k) # to suppress unread configuration warning
           @has_tag_parts = true if v.include?('tag_parts')
-          @map[k] = DynamicExpander.new(k, v)
+          @map[k] = DynamicExpander.new(k, v, @prepare_value)
         end
       end
 
@@ -160,7 +165,7 @@ DESC
     end
 
     class DynamicExpander
-      def initialize(param_key, param_value)
+      def initialize(param_key, param_value, prepare_value)
         if param_value.include?('${')
           __str_eval_code__ = parse_parameter(param_value)
 
@@ -174,6 +179,12 @@ DESC
           EORUBY
         else
           @param_value = param_value
+        end
+
+        begin
+          eval prepare_value if prepare_value
+        rescue SyntaxError
+          raise ConfigError, "Pass invalid syntax parameter : key = prepare_value, value = #{prepare_value}"
         end
 
         begin
