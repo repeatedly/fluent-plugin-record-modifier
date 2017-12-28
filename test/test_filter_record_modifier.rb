@@ -126,6 +126,21 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     assert_equal [{"k1" => 'v', "k2" => 'v'}], d.filtered.map(&:last)
   end
 
+  def test_prepare_values
+    d = create_driver %[
+      prepare_value @foo = 'foo'
+      <record>
+        test_key ${@foo}
+      </record>
+    ]
+
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'v')
+    end
+
+    assert_equal [{"k1" => 'v', "test_key" => 'foo'}], d.filtered.map(&:last)
+  end
+
   sub_test_case 'frozen check' do
     def test_set_char_encoding
       d = create_driver %[
