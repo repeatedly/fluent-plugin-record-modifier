@@ -1,3 +1,8 @@
+Release 0.6.2 - 2017/12/27
+
+  * Add prepare_value parameter
+  * Fix non-string object handling
+
 Release 0.6.1 - 2017/12/12
 
   * Drop fluentd v0.10 support
