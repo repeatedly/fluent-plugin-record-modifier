@@ -134,11 +134,11 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       </record>
     ]
 
-    d.run(default_tag: @tag) do
-      d.feed("k1" => 'v')
+    d.run do
+      d.emit("k1" => 'v')
     end
 
-    assert_equal [{"k1" => 'v', "test_key" => 'foo'}], d.filtered.map(&:last)
+    assert_equal [{"k1" => 'v', "test_key" => 'foo'}], d.filtered_as_array.map(&:last)
   end
 
   sub_test_case 'frozen check' do
