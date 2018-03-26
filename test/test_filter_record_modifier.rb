@@ -34,7 +34,7 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     d = create_driver
     map = d.instance.instance_variable_get(:@map)
 
-    map.each_pair { |k, v|
+    map.each_pair {|k, v|
       assert v.is_a?(Fluent::Plugin::RecordModifierFilter::DynamicExpander)
     }
   end
@@ -49,9 +49,9 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => @tag, 'tag_wrap' => "-#{@tag.split('.')[0]}-#{@tag.split('.')[1]}-"}
     assert_equal [
-      {"a" => 1}.merge(mapped),
-      {"a" => 2}.merge(mapped),
-    ], d.filtered.map { |e| e.last }
+                     {"a" => 1}.merge(mapped),
+                     {"a" => 2}.merge(mapped),
+                 ], d.filtered.map {|e| e.last}
   end
 
   def test_set_char_encoding
@@ -61,15 +61,15 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     d.run(default_tag: @tag) do
       d.feed("k" => 'v'.force_encoding('BINARY'))
-      d.feed("k" => %w(v ビ).map{|v| v.force_encoding('BINARY')})
+      d.feed("k" => %w(v ビ).map {|v| v.force_encoding('BINARY')})
       d.feed("k" => {"l" => 'ビ'.force_encoding('BINARY')})
     end
 
     assert_equal [
-      {"k" => 'v'.force_encoding('UTF-8')},
-      {"k" => %w(v ビ).map{|v| v.force_encoding('UTF-8')}},
-      {"k" => {"l" => 'ビ'.force_encoding('UTF-8')}},
-    ], d.filtered.map { |e| e.last }
+                     {"k" => 'v'.force_encoding('UTF-8')},
+                     {"k" => %w(v ビ).map {|v| v.force_encoding('UTF-8')}},
+                     {"k" => {"l" => 'ビ'.force_encoding('UTF-8')}},
+                 ], d.filtered.map {|e| e.last}
   end
 
   def test_convert_char_encoding
@@ -79,15 +79,15 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     d.run(default_tag: @tag) do
       d.feed("k" => 'v'.force_encoding('utf-8'))
-      d.feed("k" => %w(v ビ).map{|v| v.force_encoding('utf-8')})
+      d.feed("k" => %w(v ビ).map {|v| v.force_encoding('utf-8')})
       d.feed("k" => {"l" => 'ビ'.force_encoding('utf-8')})
     end
 
     assert_equal [
-      {"k" => 'v'.force_encoding('cp932')},
-      {"k" => %w(v ビ).map{|v| v.encode!('cp932')}},
-      {"k" => {"l" => 'ビ'.encode!('cp932')}},
-    ], d.filtered.map { |e| e.last }
+                     {"k" => 'v'.force_encoding('cp932')},
+                     {"k" => %w(v ビ).map {|v| v.encode!('cp932')}},
+                     {"k" => {"l" => 'ビ'.encode!('cp932')}},
+                 ], d.filtered.map {|e| e.last}
   end
 
   def test_remove_one_key
@@ -99,7 +99,7 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       d.feed("k1" => 'v', "k2" => 'v')
     end
 
-    assert_equal [{"k2" => 'v'}], d.filtered.map { |e| e.last }
+    assert_equal [{"k2" => 'v'}], d.filtered.map {|e| e.last}
   end
 
   def test_remove_multiple_keys
@@ -111,7 +111,7 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       d.feed({"k1" => 'v', "k2" => 'v', "k4" => 'v'})
     end
 
-    assert_equal [{"k4" => 'v'}], d.filtered.map { |e| e.last }
+    assert_equal [{"k4" => 'v'}], d.filtered.map {|e| e.last}
   end
 
   def test_remove_non_whitelist_keys
@@ -141,6 +141,28 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     assert_equal [{"k1" => 'v', "test_key" => 'foo'}], d.filtered.map(&:last)
   end
 
+  def test_replace_values
+    d = create_driver %[
+        <replace>
+          key k1
+          expression /^.+(?<middle>.{2}).+$/
+          middle ors
+        </replace>
+        <replace>
+          key k2
+          expression /^(.{1}).{2}(.{1})$/
+          1 ""
+          2 _test
+        </replace>
+    ]
+
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'hoge', "k2" => 'hoge', "k3" => 'bar')
+    end
+
+    assert_equal [{"k1" => 'horse', "k2" => 'og_test', "k3" => 'bar'}], d.filtered.map(&:last)
+  end
+
   sub_test_case 'frozen check' do
     def test_set_char_encoding
       d = create_driver %[
@@ -153,9 +175,9 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       end
 
       assert_equal [
-        {"k" => 'v'.force_encoding('UTF-8'), 'n' => 1},
-        {"k" => {"l" => 'v'.force_encoding('UTF-8'), 'n' => 1}},
-      ], d.filtered.map { |e| e.last }
+                       {"k" => 'v'.force_encoding('UTF-8'), 'n' => 1},
+                       {"k" => {"l" => 'v'.force_encoding('UTF-8'), 'n' => 1}},
+                   ], d.filtered.map {|e| e.last}
     end
 
     def test_convert_char_encoding
@@ -169,9 +191,9 @@ class RecordModifierFilterTest < Test::Unit::TestCase
       end
 
       assert_equal [
-        {"k" => 'v'.force_encoding('cp932'), 'n' => 1},
-        {"k" => {"l" => 'v'.force_encoding('cp932'), 'n' => 1}},
-      ], d.filtered.map { |e| e.last }
+                       {"k" => 'v'.force_encoding('cp932'), 'n' => 1},
+                       {"k" => {"l" => 'v'.force_encoding('cp932'), 'n' => 1}},
+                   ], d.filtered.map {|e| e.last}
     end
   end
 end
