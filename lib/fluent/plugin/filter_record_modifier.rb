@@ -8,7 +8,7 @@ module Fluent
                  desc: <<-DESC
 Prepare values for filtering in configure phase. Prepared values can be used in <record>.
 You can write any ruby code.
-    DESC
+ DESC
     config_param :char_encoding, :string, default: nil,
                  desc: <<-DESC
 Fluentd including some plugins treats the logs as a BINARY by default to forward.
@@ -16,25 +16,25 @@ But an user sometimes processes the logs depends on their requirements,
 e.g. handling char encoding correctly.
 In more detail, please refer this section:
 https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding.
-    DESC
+ DESC
     config_param :remove_keys, :string, default: nil,
                  desc: <<-DESC
 The logs include needless record keys in some cases.
 You can remove it by using `remove_keys` parameter.
 This option is exclusive with `whitelist_keys`.
-    DESC
+ DESC
 
     config_param :whitelist_keys, :string, default: nil,
                  desc: <<-DESC
 Specify `whitelist_keys` to remove all unexpected keys and values from events.
 Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
-    DESC
+ DESC
 
     config_param :replace, :bool, default: false,
                  desc: <<-DESC
 Boolean flag to enable replace function. Default is false.
-    DESC
+ DESC
 
     def configure(conf)
       super
@@ -132,7 +132,7 @@ Boolean flag to enable replace function. Default is false.
       if value.is_a?(String)
         value.force_encoding(@from_enc)
       elsif value.is_a?(Hash)
-        value.each_pair {|k, v|
+        value.each_pair { |k, v|
           if v.frozen? && v.is_a?(String)
             value[k] = set_encoding(v.dup)
           else
@@ -140,7 +140,7 @@ Boolean flag to enable replace function. Default is false.
           end
         }
       elsif value.is_a?(Array)
-        value.each {|v| set_encoding(v)}
+        value.each { |v| set_encoding(v) }
       else
         value
       end
@@ -151,7 +151,7 @@ Boolean flag to enable replace function. Default is false.
         value.force_encoding(@from_enc) if value.encoding == Encoding::BINARY
         value.encode!(@to_enc, @from_enc, :invalid => :replace, :undef => :replace)
       elsif value.is_a?(Hash)
-        value.each_pair {|k, v|
+        value.each_pair { |k, v|
           if v.frozen? && v.is_a?(String)
             value[k] = convert_encoding(v.dup)
           else
@@ -159,7 +159,7 @@ Boolean flag to enable replace function. Default is false.
           end
         }
       elsif value.is_a?(Array)
-        value.each {|v| convert_encoding(v)}
+        value.each { |v| convert_encoding(v) }
       else
         value
       end
@@ -168,7 +168,7 @@ Boolean flag to enable replace function. Default is false.
     HOSTNAME_PLACEHOLDERS = %W(__HOSTNAME__ ${hostname})
 
     def check_config_placeholders(k, v)
-      HOSTNAME_PLACEHOLDERS.each {|ph|
+      HOSTNAME_PLACEHOLDERS.each { |ph|
         if v.include?(ph)
           raise ConfigError, %!#{ph} placeholder in #{k} is removed. Use "\#{Socket.gethostname}" instead.!
         end
@@ -183,10 +183,7 @@ Boolean flag to enable replace function. Default is false.
           # Use class_eval with string instead of define_method for performance.
           # It can't share instructions but this is 2x+ faster than define_method in filter case.
           # Refer: http://tenderlovemaking.com/2013/03/03/dynamic_method_definitions.html
-          (
-          class << self;
-            self;
-          end).class_eval <<-EORUBY, __FILE__, __LINE__ + 1
+          (class << self; self; end).class_eval <<-EORUBY,  __FILE__, __LINE__ + 1
             def expand(tag, time, record, tag_parts)
               #{__str_eval_code__}
             end
