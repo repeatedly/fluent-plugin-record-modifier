@@ -56,16 +56,13 @@ Boolean flag to enable replace function. Default is false.
               method(:set_encoding)
             end
 
-        (
-        class << self;
-          self;
-        end).module_eval do
+        (class << self; self; end).module_eval do
           define_method(:change_encoding, m)
         end
       end
 
       @has_tag_parts = false
-      conf.elements.select {|element| element.name == 'record'}.each do |element|
+      conf.elements.select { |element| element.name == 'record' }.each do |element|
         element.each_pair do |k, v|
           check_config_placeholders(k, v)
           element.has_key?(k) # to suppress unread configuration warning
@@ -76,7 +73,7 @@ Boolean flag to enable replace function. Default is false.
 
       @replace_keys = Array.new
       if @replace
-        conf.elements.select {|element| element.name == 'replace'}.each do |element|
+        conf.elements.select { |element| element.name == 'replace' }.each do |element|
           expr = if element['expression'][0] == "/" && element['expression'][-1] == "/"
                    element['expression'][1..-2]
                  else
@@ -103,12 +100,12 @@ Boolean flag to enable replace function. Default is false.
     def filter(tag, time, record)
       tag_parts = @has_tag_parts ? tag.split('.') : nil
 
-      @map.each_pair {|k, v|
+      @map.each_pair { |k, v|
         record[k] = v.expand(tag, time, record, tag_parts)
       }
 
       if @remove_keys
-        @remove_keys.each {|v|
+        @remove_keys.each { |v|
           record.delete(v)
         }
       elsif @whitelist_keys
@@ -126,7 +123,7 @@ Boolean flag to enable replace function. Default is false.
       end
 
       record = change_encoding(record) if @char_encoding
-      recordk
+      record
     end
 
     private
