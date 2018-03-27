@@ -156,19 +156,25 @@ If you want to replace specific value for keys you can use `replace` section.
 <filter pattern>
   @type record_modifier
 
+  # set replace to true, default false
+  replace true
   # replace key key1
   <replace>
+    # your key name
     key key1
-    # you regexp
-    expression /^.+(?<middle>.{2}).+$/
-    middle ors
+    # your regexp
+    expression /^(?<start>.+).{2}(?<end>.+)$/
+    # replace string
+    replace \\k<start>ors\\k<end>
   </replace>
+  # replace key key2
   <replace>
+    # your key name
     key key2
-    # you regexp
+    # your regexp
     expression /^(.{1}).{2}(.{1})$/
-    1 ""
-    2 _test 
+    # replace string
+    replace \\1ors\\2
   </replace>
 </filter>
 ```
@@ -182,7 +188,7 @@ If following record is passed:
 then you got new record like below:
 
 ```js
-{"key1":"horse", "key2":"og_test", "key3":"bar"}
+{"key1":"horse", "key2":"horse", "key3":"bar"}
 ```
 
 
