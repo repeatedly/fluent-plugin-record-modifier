@@ -85,7 +85,7 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
     assert_equal [
       {"k" => 'v'.force_encoding('cp932')},
-      {"k" => %w(v ビ).map {|v| v.encode!('cp932')}},
+      {"k" => %w(v ビ).map{|v| v.encode!('cp932')}},
       {"k" => {"l" => 'ビ'.encode!('cp932')}},
     ], d.filtered.map { |e| e.last }
   end

@@ -8,7 +8,7 @@ module Fluent
                  desc: <<-DESC
 Prepare values for filtering in configure phase. Prepared values can be used in <record>.
 You can write any ruby code.
- DESC
+DESC
     config_param :char_encoding, :string, default: nil,
                  desc: <<-DESC
 Fluentd including some plugins treats the logs as a BINARY by default to forward.
@@ -16,25 +16,25 @@ But an user sometimes processes the logs depends on their requirements,
 e.g. handling char encoding correctly.
 In more detail, please refer this section:
 https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding.
- DESC
+DESC
     config_param :remove_keys, :string, default: nil,
                  desc: <<-DESC
 The logs include needless record keys in some cases.
 You can remove it by using `remove_keys` parameter.
 This option is exclusive with `whitelist_keys`.
- DESC
+DESC
 
     config_param :whitelist_keys, :string, default: nil,
                  desc: <<-DESC
 Specify `whitelist_keys` to remove all unexpected keys and values from events.
 Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
- DESC
+DESC
 
     config_param :replace, :bool, default: false,
                  desc: <<-DESC
 Boolean flag to enable replace function. Default is false.
- DESC
+DESC
 
     def configure(conf)
       super
