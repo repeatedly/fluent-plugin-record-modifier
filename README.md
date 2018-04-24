@@ -156,8 +156,6 @@ If you want to replace specific value for keys you can use `replace` section.
 <filter pattern>
   @type record_modifier
 
-  # set replace to true, default false
-  replace true
   # replace key key1
   <replace>
     # your key name

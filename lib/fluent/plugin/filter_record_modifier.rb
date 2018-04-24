@@ -31,10 +31,21 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
-    config_param :replace, :bool, default: false,
-                 desc: <<-DESC
-Boolean flag to enable replace function. Default is false.
-DESC
+    config_section :replace, param_name: :replaces, multi: true do
+                 desc"The field name to which the regular expression is applied"
+                 config_param :key, :string
+                 desc "The regular expression"
+                 config_param :expression do |value|
+                   if value.start_with?("/") && value.end_with?("/")
+                     Regexp.compile(value[1..-2])
+                   else
+                     $log.warn("You should use \"pattern /#{value}/\" instead of \"pattern #{value}\"")
+                     Regexp.compile(value)
+                   end
+                 end
+                 desc "The replacement string"
+                 config_param :replace, :string
+    end
 
     def configure(conf)
       super
@@ -71,20 +82,6 @@ DESC
         end
       end
 
-      @replace_keys = Array.new
-      if @replace
-        conf.elements.select { |element| element.name == 'replace' }.each do |element|
-          expr = if element['expression'][0] == "/" && element['expression'][-1] == "/"
-                   element['expression'][1..-2]
-                 else
-                   element['expression']
-                 end
-          @replace_keys.push("key" => element['key'],
-                             "expression" => Regexp.new(expr),
-                             "replace" => element['replace'])
-        end
-      end
-
       if @remove_keys and @whitelist_keys
         raise Fluent::ConfigError, "remove_keys and whitelist_keys are exclusive with each other."
       elsif @remove_keys
@@ -116,9 +113,9 @@ DESC
         record = modified
       end
 
-      if @replace && @replace_keys
-        @replace_keys.each {|rep|
-          record[rep['key']] = record[rep['key']].gsub(rep['expression'], rep['replace']) if record.include?(rep['key']) && rep['expression'].match(record[rep['key']])
+      if @replaces.any?
+        @replaces.each {|replace|
+          record[replace.key] = record[replace.key].gsub(replace.expression, replace.replace) if record.include?(replace.key) && replace.expression.match(record[replace.key])
         }
       end
 

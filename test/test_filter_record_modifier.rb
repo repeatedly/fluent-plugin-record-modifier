@@ -143,7 +143,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_replace_values
     d = create_driver %[
-        replace true
         <replace>
           key k1
           expression /^(?<start>.+).{2}(?<end>.+)$/
@@ -165,7 +164,6 @@ class RecordModifierFilterTest < Test::Unit::TestCase
 
   def test_does_not_replace
     d = create_driver %[
-        replace true
         <replace>
           key k1
           expression /^(?<start>.+).{2}(?<end>.+)$/
