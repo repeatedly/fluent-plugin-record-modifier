@@ -9,7 +9,6 @@ Gem::Specification.new do |gem|
   gem.version     = File.read("VERSION").strip
   gem.authors     = ["Masahiro Nakagawa"]
   gem.email       = "repeatedly@gmail.com"
-  gem.has_rdoc    = false
   #gem.platform    = Gem::Platform::RUBY
   gem.license     = 'MIT'
   gem.files       = `git ls-files`.split("\n")
