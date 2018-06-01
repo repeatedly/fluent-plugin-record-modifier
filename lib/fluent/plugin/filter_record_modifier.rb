@@ -32,19 +32,19 @@ This option is exclusive with `remove_keys`.
 DESC
 
     config_section :replace, param_name: :replaces, multi: true do
-                 desc"The field name to which the regular expression is applied"
-                 config_param :key, :string
-                 desc "The regular expression"
-                 config_param :expression do |value|
-                   if value.start_with?("/") && value.end_with?("/")
-                     Regexp.compile(value[1..-2])
-                   else
-                     $log.warn("You should use \"pattern /#{value}/\" instead of \"pattern #{value}\"")
-                     Regexp.compile(value)
-                   end
-                 end
-                 desc "The replacement string"
-                 config_param :replace, :string
+      desc "The field name to which the regular expression is applied"
+      config_param :key, :string
+      desc "The regular expression"
+      config_param :expression do |value|
+        if value.start_with?("/") && value.end_with?("/")
+          Regexp.compile(value[1..-2])
+        else
+          $log.warn "You should use \"pattern /#{value}/\" instead of \"pattern #{value}\""
+          Regexp.compile(value)
+        end
+      end
+      desc "The replacement string"
+      config_param :replace, :string
     end
 
     def configure(conf)
@@ -113,9 +113,12 @@ DESC
         record = modified
       end
 
-      if @replaces.any?
-        @replaces.each {|replace|
-          record[replace.key] = record[replace.key].gsub(replace.expression, replace.replace) if record.include?(replace.key) && replace.expression.match(record[replace.key])
+      unless @replaces.empty?
+        @replaces.each { |replace|
+          target_key = replace.key
+          if record.include?(target_key) && replace.expression.match(record[target_key])
+            record[target_key] = record[target_key].gsub(replace.expression, replace.replace)
+          end
         }
       end
 
