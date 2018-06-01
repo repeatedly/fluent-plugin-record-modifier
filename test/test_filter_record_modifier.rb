@@ -141,6 +141,43 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     assert_equal [{"k1" => 'v', "test_key" => 'foo'}], d.filtered.map(&:last)
   end
 
+  def test_replace_values
+    d = create_driver %[
+        <replace>
+          key k1
+          expression /^(?<start>.+).{2}(?<end>.+)$/
+          replace \\k<start>ors\\k<end>
+        </replace>
+        <replace>
+          key k2
+          expression /^(.{1}).{2}(.{1})$/
+          replace \\1ors\\2
+        </replace>
+    ]
+
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'hoge', "k2" => 'hoge', "k3" => 'bar')
+    end
+
+    assert_equal [{"k1" => 'horse', "k2" => 'horse', "k3" => 'bar'}], d.filtered.map(&:last)
+  end
+
+  def test_does_not_replace
+    d = create_driver %[
+        <replace>
+          key k1
+          expression /^(?<start>.+).{2}(?<end>.+)$/
+          replace \\k<start>ors\\k<end>
+        </replace>
+    ]
+
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'hog')
+    end
+
+    assert_equal [{"k1" => 'hog'}], d.filtered.map(&:last)
+  end
+
   sub_test_case 'frozen check' do
     def test_set_char_encoding
       d = create_driver %[

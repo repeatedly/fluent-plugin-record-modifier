@@ -31,6 +31,22 @@ Modified events will have only specified keys (if exist in original events).
 This option is exclusive with `remove_keys`.
 DESC
 
+    config_section :replace, param_name: :replaces, multi: true do
+                 desc"The field name to which the regular expression is applied"
+                 config_param :key, :string
+                 desc "The regular expression"
+                 config_param :expression do |value|
+                   if value.start_with?("/") && value.end_with?("/")
+                     Regexp.compile(value[1..-2])
+                   else
+                     $log.warn("You should use \"pattern /#{value}/\" instead of \"pattern #{value}\"")
+                     Regexp.compile(value)
+                   end
+                 end
+                 desc "The replacement string"
+                 config_param :replace, :string
+    end
+
     def configure(conf)
       super
 
@@ -95,6 +111,12 @@ DESC
           modified[k] = v if @whitelist_keys.include?(k)
         end
         record = modified
+      end
+
+      if @replaces.any?
+        @replaces.each {|replace|
+          record[replace.key] = record[replace.key].gsub(replace.expression, replace.replace) if record.include?(replace.key) && replace.expression.match(record[replace.key])
+        }
       end
 
       record = change_encoding(record) if @char_encoding

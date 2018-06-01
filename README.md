@@ -148,6 +148,48 @@ then you got new record like below:
 {"key1":"hoge", "key2":"foo"}
 ```
 
+### replace_keys_value
+
+If you want to replace specific value for keys you can use `replace` section.
+
+```conf
+<filter pattern>
+  @type record_modifier
+
+  # replace key key1
+  <replace>
+    # your key name
+    key key1
+    # your regexp
+    expression /^(?<start>.+).{2}(?<end>.+)$/
+    # replace string
+    replace \\k<start>ors\\k<end>
+  </replace>
+  # replace key key2
+  <replace>
+    # your key name
+    key key2
+    # your regexp
+    expression /^(.{1}).{2}(.{1})$/
+    # replace string
+    replace \\1ors\\2
+  </replace>
+</filter>
+```
+
+If following record is passed:
+
+```js
+{"key1":"hoge", "key2":"hoge", "key3":"bar"}
+```
+
+then you got new record like below:
+
+```js
+{"key1":"horse", "key2":"horse", "key3":"bar"}
+```
+
+
 ### Ruby code trick for complex logic
 
 If you need own complex logic in filter, writing filter plugin is better. But if you don't want to write new plugin, you can use temporal key trick like below:
@@ -173,12 +215,6 @@ In v0.10, you can use `record_modifier` output to emulate filter. `record_modifi
       gen_host "#{Socket.gethostname}"
       foo bar
     </match>
-
-## TODO
-
-* Adding following features if needed
-
-    * Replace record value
 
 ## Copyright
 
