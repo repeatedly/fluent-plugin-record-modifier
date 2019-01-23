@@ -9,6 +9,7 @@ In this case, you can use *record_modifier* to add "hostname" field to event rec
 
 | fluent-plugin-record-modifier  | fluentd | ruby |
 |--------------------------------|---------|------|
+| >= 2.0.0 | >= v1.0.0  | >= 2.1 |
 | >= 1.0.0 | >= v0.14.0 | >= 2.1 |
 |  < 1.0.0 | >= v0.12.0 | >= 1.9 |
 
@@ -16,7 +17,7 @@ In this case, you can use *record_modifier* to add "hostname" field to event rec
 
 Use RubyGems:
 
-    gem install fluent-plugin-record-modifier --no-document
+    fluent-gem install fluent-plugin-record-modifier --no-document
 
 ## Configuration
 
