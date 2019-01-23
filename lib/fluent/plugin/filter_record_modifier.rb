@@ -50,10 +50,6 @@ DESC
     def configure(conf)
       super
 
-      if conf.has_key?('include_tag_key')
-        raise ConfigError, "include_tag_key and tag_key parameters are removed. Use 'tag ${tag}' in <record> section"
-      end
-
       @map = {}
       @to_enc = nil
       if @char_encoding
@@ -75,7 +71,6 @@ DESC
       @has_tag_parts = false
       conf.elements.select { |element| element.name == 'record' }.each do |element|
         element.each_pair do |k, v|
-          check_config_placeholders(k, v)
           element.has_key?(k) # to suppress unread configuration warning
           @has_tag_parts = true if v.include?('tag_parts')
           @map[k] = DynamicExpander.new(k, v, @prepare_value)
@@ -163,16 +158,6 @@ DESC
       else
         value
       end
-    end
-
-    HOSTNAME_PLACEHOLDERS = %W(__HOSTNAME__ ${hostname})
-
-    def check_config_placeholders(k, v)
-      HOSTNAME_PLACEHOLDERS.each { |ph|
-        if v.include?(ph)
-          raise ConfigError, %!#{ph} placeholder in #{k} is removed. Use "\#{Socket.gethostname}" instead.!
-        end
-      }
     end
 
     class DynamicExpander
