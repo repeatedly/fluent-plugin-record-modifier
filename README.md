@@ -206,14 +206,16 @@ If you need own complex logic in filter, writing filter plugin is better. But if
 
 ### record_modifier output
 
-In v0.10, you can use `record_modifier` output to emulate filter. `record_modifier` output doesn't support `<record>` way.
+Output plugin version of `record_modifier` filter. If you want to process events and change tag at the same time, this plugin is useful.
 
     <match pattern>
-      type record_modifier
-      tag foo.filtered
+      @type record_modifier
+      tag foo.${record["field1"]}
 
-      gen_host "#{Socket.gethostname}"
-      foo bar
+      <record>
+        gen_host "#{Socket.gethostname}"
+        foo bar
+      </record>
     </match>
 
 ## Copyright

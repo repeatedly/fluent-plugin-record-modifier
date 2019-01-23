@@ -8,13 +8,11 @@ class RecordModifierOutputTest < Test::Unit::TestCase
   end
 
   CONFIG = %q!
-    type record_modifier
     tag foo.filtered
-
-    gen_host "#{Socket.gethostname}"
-    foo bar
-    include_tag_key
-    tag_key included_tag
+    <record>
+      gen_host "#{Socket.gethostname}"
+      foo bar
+    </record>
     remove_keys hoge
   !
 
@@ -31,8 +29,8 @@ class RecordModifierOutputTest < Test::Unit::TestCase
     d = create_driver
     map = d.instance.instance_variable_get(:@map)
 
-    assert_equal get_hostname, map['gen_host']
-    assert_equal 'bar', map['foo']
+    assert_equal get_hostname, map['gen_host'].param_value
+    assert_equal 'bar', map['foo'].param_value
   end
 
   def test_format
@@ -43,17 +41,39 @@ class RecordModifierOutputTest < Test::Unit::TestCase
       d.feed({"a" => 2})
     end
 
-    mapped = {'gen_host' => get_hostname, 'foo' => 'bar', 'included_tag' => 'test_tag'}
+    mapped = {'gen_host' => get_hostname, 'foo' => 'bar'}
     assert_equal [
       {"a" => 1}.merge(mapped),
       {"a" => 2}.merge(mapped),
     ], d.events.map { |e| e.last }
   end
 
+  def test_dynamic_tag_with_tag
+    d = create_driver %[
+      tag foo.${tag}
+    ]
+
+    d.run(default_tag: 'test_tag') do
+      d.feed({"k" => 'v'})
+    end
+
+    assert_equal 'foo.test_tag', d.events.first.first
+  end
+
+  def test_dynamic_tag_with_record_field
+    d = create_driver %[
+      tag foo.${record["k"]}
+    ]
+
+    d.run(default_tag: 'test_tag') do
+      d.feed({"k" => 'v'})
+    end
+
+    assert_equal 'foo.v', d.events.first.first
+  end
+
   def test_set_char_encoding
     d = create_driver %[
-      type record_modifier
-
       tag foo.filtered
       char_encoding utf-8
     ]
@@ -67,8 +87,6 @@ class RecordModifierOutputTest < Test::Unit::TestCase
 
   def test_convert_char_encoding
     d = create_driver %[
-      type record_modifier
-
       tag foo.filtered
       char_encoding utf-8:cp932
     ]
@@ -82,8 +100,6 @@ class RecordModifierOutputTest < Test::Unit::TestCase
 
   def test_remove_one_key
     d = create_driver %[
-      type record_modifier
-
       tag foo.filtered
       remove_keys k1
     ]
@@ -97,8 +113,6 @@ class RecordModifierOutputTest < Test::Unit::TestCase
 
   def test_remove_multiple_keys
     d = create_driver %[
-      type record_modifier
-
       tag foo.filtered
       remove_keys k1, k2, k3
     ]
@@ -112,8 +126,6 @@ class RecordModifierOutputTest < Test::Unit::TestCase
 
   def test_remove_non_whitelist_keys
     d = create_driver %[
-      type record_modifier
-
       tag foo.filtered
       whitelist_keys k1, k2, k3
     ]
