@@ -1,3 +1,8 @@
+Release 2.0.0 - 2019/01/23
+
+  * Update output plugin to follow filter plugin
+  * Remove backward compatibility check for 0.5.0 or earlier version
+
 Release 1.1.0 - 2018/06/01
 
   * Add `replace` config sections
