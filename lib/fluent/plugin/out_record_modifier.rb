@@ -97,6 +97,10 @@ DESC
       GC.start
     end
 
+    def multi_workers_ready?
+      true
+    end
+
     def process(tag, es)
       tag_parts = @has_tag_parts ? tag.split('.') : nil
       if @tag_ex.param_value.nil?
