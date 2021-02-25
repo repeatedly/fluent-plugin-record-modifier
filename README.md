@@ -164,7 +164,7 @@ If you want to replace specific value for keys you can use `replace` section.
     # your regexp
     expression /^(?<start>.+).{2}(?<end>.+)$/
     # replace string
-    replace \\k<start>ors\\k<end>
+    replace \k<start>ors\k<end>
   </replace>
   # replace key key2
   <replace>
@@ -173,7 +173,7 @@ If you want to replace specific value for keys you can use `replace` section.
     # your regexp
     expression /^(.{1}).{2}(.{1})$/
     # replace string
-    replace \\1ors\\2
+    replace \1ors\2
   </replace>
 </filter>
 ```
