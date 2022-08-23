@@ -145,18 +145,18 @@ class RecordModifierFilterTest < Test::Unit::TestCase
   end
 
   def test_replace_values
-    d = create_driver %[
+    d = create_driver <<'CONFIG'
         <replace>
           key k1
           expression /^(?<start>.+).{2}(?<end>.+)$/
-          replace \\k<start>ors\\k<end>
+          replace \k<start>ors\k<end>
         </replace>
         <replace>
           key k2
           expression /^(.{1}).{2}(.{1})$/
-          replace \\1ors\\2
+          replace \1ors\2
         </replace>
-    ]
+CONFIG
 
     d.run(default_tag: @tag) do
       d.feed("k1" => 'hoge', "k2" => 'hoge', "k3" => 'bar')
@@ -166,13 +166,13 @@ class RecordModifierFilterTest < Test::Unit::TestCase
   end
 
   def test_does_not_replace
-    d = create_driver %[
+    d = create_driver <<'CONFIG'
         <replace>
           key k1
           expression /^(?<start>.+).{2}(?<end>.+)$/
-          replace \\k<start>ors\\k<end>
+          replace \k<start>ors\k<end>
         </replace>
-    ]
+CONFIG
 
     d.run(default_tag: @tag) do
       d.feed("k1" => 'hog')
