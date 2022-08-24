@@ -138,8 +138,8 @@ DESC
         }
       elsif @whitelist_keys
         modified = {}
-        record.each do |k, v|
-          modified[k] = v if @whitelist_keys.include?(k)
+        @whitelist_keys.each do |key|
+          modified[key] = record[key] if record.has_key?(key)
         end
         record = modified
       end
