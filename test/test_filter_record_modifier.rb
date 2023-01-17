@@ -114,6 +114,18 @@ class RecordModifierFilterTest < Test::Unit::TestCase
     assert_equal [{"k4" => 'v'}], d.filtered.map { |e| e.last }
   end
 
+  def test_remove_nested_keys
+    d = create_driver %[
+      remove_keys k1, $.kubernetes.test
+    ]
+
+    d.run(default_tag: @tag) do
+      d.feed("k1" => 'v', "kubernetes" => {"test" => 'v', "prod" => 'v'}, "k2" => 'v')
+    end
+
+    assert_equal [{"kubernetes" => {"prod" => 'v'}, "k2" => 'v'}], d.filtered.map { |e| e.last }
+  end
+
   def test_remove_non_whitelist_keys
     d = create_driver %[
       <record>
