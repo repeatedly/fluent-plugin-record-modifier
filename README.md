@@ -202,7 +202,7 @@ If you need own complex logic in filter, writing filter plugin is better. But if
   <record>
     _dummy_ ${if record.has_key?('foo'); record['bar'] = 'Hi!'; end; nil}
   </record>
-</filter>}
+</filter>
 ```
 
 ### record_modifier output
