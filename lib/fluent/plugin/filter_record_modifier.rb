@@ -98,7 +98,12 @@ DESC
       tag_parts = @has_tag_parts ? tag.split('.') : nil
 
       @map.each_pair { |k, v|
-        record[k] = v.expand(tag, time, record, tag_parts)
+        begin
+          record[k] = v.expand(tag, time, record, tag_parts)
+        rescue
+          $log.error("filter_record_modifier::filter - exception in expression: '#{v.getcode}'")
+          raise
+        end
       }
 
       if @remove_keys
@@ -166,9 +171,15 @@ DESC
     end
 
     class DynamicExpander
+      def getcode()
+        @code
+      end
+
       def initialize(param_key, param_value, prepare_value)
         if param_value.include?('${')
           __str_eval_code__ = parse_parameter(param_value)
+
+          @code=__str_eval_code__
 
           # Use class_eval with string instead of define_method for performance.
           # It can't share instructions but this is 2x+ faster than define_method in filter case.
