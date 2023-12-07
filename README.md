@@ -124,6 +124,8 @@ then you got new record like below:
 {"key3":"bar"}
 ```
 
+Since v2.2.0, `remove_keys` supports nested key delete via [`record_accessor` syntax](https://docs.fluentd.org/plugin-helper-overview/api-plugin-helper-record_accessor).
+
 ### whitelist_keys
 
 If you want to handle the set of explicitly specified keys, you can use `whitelist_keys` of this plugin. It's exclusive with `remove_keys`.
