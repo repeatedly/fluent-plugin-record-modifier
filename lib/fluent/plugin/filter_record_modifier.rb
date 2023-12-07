@@ -4,6 +4,8 @@ module Fluent
   class Plugin::RecordModifierFilter < Plugin::Filter
     Fluent::Plugin.register_filter('record_modifier', self)
 
+    helpers :record_accessor
+
     config_param :prepare_value, :string, default: nil,
                  desc: <<-DESC
 Prepare values for filtering in configure phase. Prepared values can be used in <record>.
@@ -17,7 +19,7 @@ e.g. handling char encoding correctly.
 In more detail, please refer this section:
 https://github.com/repeatedly/fluent-plugin-record-modifier#char_encoding.
 DESC
-    config_param :remove_keys, :string, default: nil,
+    config_param :remove_keys, :array, default: nil,
                  desc: <<-DESC
 The logs include needless record keys in some cases.
 You can remove it by using `remove_keys` parameter.
@@ -80,7 +82,9 @@ DESC
       if @remove_keys and @whitelist_keys
         raise Fluent::ConfigError, "remove_keys and whitelist_keys are exclusive with each other."
       elsif @remove_keys
-        @remove_keys = @remove_keys.split(',').map(&:strip)
+        @remove_keys = @remove_keys.map { |key|
+          record_accessor_create(key)
+        }
       elsif @whitelist_keys
         @whitelist_keys = @whitelist_keys.split(',').map(&:strip)
         @whitelist_keys.concat(@map.keys).uniq!
@@ -98,8 +102,8 @@ DESC
       }
 
       if @remove_keys
-        @remove_keys.each { |v|
-          record.delete(v)
+        @remove_keys.each { |ra|
+          ra.delete(record)
         }
       elsif @whitelist_keys
         modified = {}
