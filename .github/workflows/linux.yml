@@ -17,6 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
+        exclude:
+          - ruby: head
         os:
           - ubuntu-latest
         experimental: [false]
